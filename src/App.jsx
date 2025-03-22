@@ -6,6 +6,7 @@ import Menu from './pages/Menu';
 import Offers from './pages/Offers';
 import About from './pages/About';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import MenuManagement from './pages/dashboard/MenuManagement';
@@ -24,6 +25,7 @@ function App() {
         <Route path="/offers" element={<Offers />} />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/menu" element={<MenuManagement />} />
