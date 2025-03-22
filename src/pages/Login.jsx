@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { loginUser } from '../services/api';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -7,6 +8,7 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,29 +19,22 @@ const Login = () => {
     }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
-    // Basic validation
-    if (!credentials.email || !credentials.password) {
-      setError('Email and password are required');
-      return;
-    }
-
-    // In a real app, this would verify credentials with your backend
-    // For demo purposes, accept any non-empty values
     try {
-      // Mock successful authentication
-      console.log('Logging in with:', credentials);
-      
-      // Store auth token (in a real app, this would come from your backend)
-      localStorage.setItem('authToken', 'demo-token');
+      const response = await loginUser(credentials);
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid email or password');
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -82,8 +77,9 @@ const Login = () => {
           <button 
             type="submit" 
             className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            disabled={isLoading}
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </div>
         
