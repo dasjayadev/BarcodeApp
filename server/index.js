@@ -10,6 +10,9 @@ const menuRoutes = require('./routes/menu');
 const offerRoutes = require('./routes/offers');
 const userRoutes = require('./routes/users');
 const qrCodeRoutes = require('./routes/qrcodes');
+const tableRoutes = require('./routes/tables');
+const orderRoutes = require('./routes/orders');
+const publicRoutes = require('./routes/public'); // Import public routes
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +38,9 @@ app.use('/api/menu', menuRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
+app.use('/api/tables', tableRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/public', publicRoutes); // Add public routes that don't need authentication
 
 // Basic route
 app.get('/', (req, res) => {

@@ -15,9 +15,12 @@ const menuItemSchema = new mongoose.Schema({
     required: true
   },
   category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'
+  },
+  categoryName: { // This stores the name directly for easier access
     type: String,
-    required: true,
-    enum: ['Starters', 'Main Course', 'Desserts', 'Drinks']
+    default: ''
   },
   image: {
     type: String

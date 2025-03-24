@@ -1,14 +1,47 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { getCurrentUser } from '../services/api';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
+
+// Define routes that don't require authentication
+const publicRoutes = [
+  '/menu',
+  '/login',
+  '/register',
+  '/public'
+];
+
+// Helper function to check if a route is public
+export const isPublicRoute = (path) => {
+  // Extract the base path without query parameters
+  const basePath = path.split('?')[0];
+  
+  // Check if the base path starts with any public route
+  return publicRoutes.some(route => basePath.startsWith(route));
+};
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [tableId, setTableId] = useState(null); // Track table ID for guest orders
 
   useEffect(() => {
+    // Check for table parameter in URL for guest ordering
+    const params = new URLSearchParams(window.location.search);
+    const tableParam = params.get('table');
+    if (tableParam) {
+      setTableId(tableParam);
+      // Store table ID in session storage for persistence across pages
+      sessionStorage.setItem('guestTableId', tableParam);
+    } else {
+      // Check if we have a stored table ID
+      const storedTableId = sessionStorage.getItem('guestTableId');
+      if (storedTableId) {
+        setTableId(storedTableId);
+      }
+    }
+
     const checkAuth = async () => {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -53,7 +86,10 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated, 
         loading, 
         login, 
-        logout 
+        logout,
+        isPublicRoute,
+        tableId,
+        isGuestOrder: !!tableId
       }}
     >
       {children}
@@ -62,5 +98,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-
-export default AuthContext;

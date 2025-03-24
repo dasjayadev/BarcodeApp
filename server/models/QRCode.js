@@ -14,6 +14,15 @@ const qrCodeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  type: {
+    type: String,
+    enum: ['global', 'table'],
+    default: 'global'
+  },
+  tableId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Table'
+  },
   createdAt: {
     type: Date,
     default: Date.now

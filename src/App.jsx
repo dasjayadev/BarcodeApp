@@ -14,6 +14,8 @@ import MenuManagement from './pages/dashboard/MenuManagement';
 import OffersManagement from './pages/dashboard/OffersManagement';
 import UserManagement from './pages/dashboard/UserManagement';
 import QRCodeManagement from './pages/dashboard/QRCodeManagement';
+import TableManagement from './pages/dashboard/TableManagement';
+import OrderManagement from './pages/dashboard/OrderManagement';
 import Settings from './pages/dashboard/Settings';
 
 // Protected route component
@@ -78,6 +80,16 @@ function App() {
           <Route path="/dashboard/qr-codes" element={
             <ProtectedRoute requiredRoles={['owner', 'manager']}>
               <QRCodeManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/tables" element={
+            <ProtectedRoute requiredRoles={['owner', 'manager']}>
+              <TableManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/orders" element={
+            <ProtectedRoute requiredRoles={['owner', 'manager', 'staff']}>
+              <OrderManagement />
             </ProtectedRoute>
           } />
           <Route path="/dashboard/settings" element={

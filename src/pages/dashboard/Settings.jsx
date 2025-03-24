@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DashboardNav from '../../components/DashboardNav';
 
 const Settings = () => {
   const [profile, setProfile] = useState({
@@ -24,6 +25,7 @@ const Settings = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <DashboardNav />
       <h1 className="text-3xl font-bold mb-4">Settings</h1>
       <form onSubmit={handleSubmit} className="max-w-md mx-auto">
         <div className="mb-4">

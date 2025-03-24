@@ -1,29 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const { currentUser, isAuthenticated, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check authentication status
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      setIsLoggedIn(true);
-      setUser(JSON.parse(userData));
-    }
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setUser(null);
+    logout();
     navigate('/login');
   };
 
@@ -35,143 +21,101 @@ const Navbar = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
+  // Check if user is staff
+  const isStaff = currentUser && ['owner', 'manager', 'staff'].includes(currentUser.role);
+
   return (
-    <nav className="bg-blue-600 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-white text-xl font-bold">BarcodeApp</Link>
-            </div>
-          </div>
+    <nav className="bg-white shadow-md">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="text-xl font-bold">Restaurant App</Link>
           
-          {/* Desktop menu */}
-          <div className="hidden md:flex items-center">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <Link to="/" className="text-white hover:bg-blue-700 px-3 py-2 rounded-md font-medium">
-                Home
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/" className="px-3 py-2 hover:text-blue-500">Home</Link>
+            <Link to="/menu" className="px-3 py-2 hover:text-blue-500">Menu</Link>
+            <Link to="/offers" className="px-3 py-2 hover:text-blue-500">Offers</Link>
+            <Link to="/about" className="px-3 py-2 hover:text-blue-500">About</Link>
+            
+            {isAuthenticated && isStaff && (
+              <Link to="/dashboard" className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Dashboard
               </Link>
-              <Link to="/menu" className="text-white hover:bg-blue-700 px-3 py-2 rounded-md font-medium">
-                Menu
-              </Link>
-              <Link to="/offers" className="text-white hover:bg-blue-700 px-3 py-2 rounded-md font-medium">
-                Offers
-              </Link>
-              <Link to="/about" className="text-white hover:bg-blue-700 px-3 py-2 rounded-md font-medium">
-                About
-              </Link>
-              
-              {isLoggedIn ? (
-                <div className="relative ml-3">
-                  <div>
+            )}
+            
+            {isAuthenticated ? (
+              <div className="relative">
+                <button 
+                  onClick={toggleDropdown}
+                  className="flex items-center space-x-1 px-3 py-2 hover:text-blue-500 focus:outline-none"
+                >
+                  <span>{currentUser?.name || 'User'}</span>
+                  <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                    {/* Add user profile link if needed */}
                     <button 
-                      onClick={toggleDropdown}
-                      className="flex items-center text-white hover:bg-blue-700 px-3 py-2 rounded-md font-medium"
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                     >
-                      <span>{user?.name || 'User'}</span>
-                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
+                      Logout
                     </button>
                   </div>
-                  
-                  {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                      <div className="py-1">
-                        {user?.role === 'owner' || user?.role === 'manager' ? (
-                          <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            Dashboard
-                          </Link>
-                        ) : null}
-                        <Link to="/dashboard/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Settings
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link to="/login" className="bg-white text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-md font-medium">
-                  Login
-                </Link>
-              )}
-            </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Login
+              </Link>
+            )}
           </div>
           
           {/* Mobile menu button */}
-          <div className="flex md:hidden items-center">
-            <button
+          <div className="md:hidden">
+            <button 
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-blue-700 focus:outline-none"
+              className="text-gray-500 hover:text-gray-600 focus:outline-none"
             >
-              <svg
-                className={`${isOpen ? 'hidden' : 'block'} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <svg
-                className={`${isOpen ? 'block' : 'hidden'} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
               </svg>
             </button>
           </div>
         </div>
-      </div>
-      
-      {/* Mobile menu */}
-      <div className={`${isOpen ? 'block' : 'hidden'} md:hidden`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <Link to="/" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md font-medium">
-            Home
-          </Link>
-          <Link to="/menu" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md font-medium">
-            Menu
-          </Link>
-          <Link to="/offers" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md font-medium">
-            Offers
-          </Link>
-          <Link to="/about" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md font-medium">
-            About
-          </Link>
-          
-          {isLoggedIn ? (
-            <>
-              {user?.role === 'owner' || user?.role === 'manager' ? (
-                <Link to="/dashboard" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md font-medium">
-                  Dashboard
-                </Link>
-              ) : null}
-              <Link to="/dashboard/settings" className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md font-medium">
-                Settings
-              </Link>
-              <button
+        
+        {/* Mobile Menu */}
+        {isOpen && (
+          <div className="md:hidden py-3">
+            <Link to="/" className="block px-3 py-2 hover:bg-gray-100">Home</Link>
+            <Link to="/menu" className="block px-3 py-2 hover:bg-gray-100">Menu</Link>
+            <Link to="/offers" className="block px-3 py-2 hover:bg-gray-100">Offers</Link>
+            <Link to="/about" className="block px-3 py-2 hover:bg-gray-100">About</Link>
+            
+            {isAuthenticated && isStaff && (
+              <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-100">Dashboard</Link>
+            )}
+            
+            {isAuthenticated ? (
+              <button 
                 onClick={handleLogout}
-                className="text-white hover:bg-blue-700 block w-full text-left px-3 py-2 rounded-md font-medium"
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100"
               >
                 Logout
               </button>
-            </>
-          ) : (
-            <Link to="/login" className="bg-white text-blue-600 hover:bg-gray-100 block px-3 py-2 rounded-md font-medium">
-              Login
-            </Link>
-          )}
-        </div>
+            ) : (
+              <Link to="/login" className="block px-3 py-2 hover:bg-gray-100">Login</Link>
+            )}
+          </div>
+        )}
       </div>
     </nav>
   );

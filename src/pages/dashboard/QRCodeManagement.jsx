@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getQRCodes, createQRCode, deleteQRCode } from '../../services/api';
+import DashboardNav from '../../components/DashboardNav';
 
 const QRCodeManagement = () => {
   const [qrCode, setQRCode] = useState({
@@ -18,7 +20,8 @@ const QRCodeManagement = () => {
   const fetchQRCodes = async () => {
     try {
       setLoading(true);
-      const response = await getQRCodes();
+      // Only fetch global QR codes here - table QR codes are managed in TableManagement
+      const response = await getQRCodes({ type: 'global' });
       setQRCodes(response.data);
       setLoading(false);
     } catch (err) {
@@ -65,6 +68,7 @@ const QRCodeManagement = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">QR Code Management</h1>
+      <DashboardNav />
       
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -78,16 +82,25 @@ const QRCodeManagement = () => {
         </div>
       )}
       
+      <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded">
+        <h2 className="text-lg font-medium mb-2">Table QR Codes</h2>
+        <p className="mb-4">Want to generate QR codes for restaurant tables? Go to Table Management to create table-specific QR codes.</p>
+        <Link to="/dashboard/tables" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Go to Table Management
+        </Link>
+      </div>
+      
       <form onSubmit={handleSubmit} className="max-w-md mx-auto mb-8">
+        <h2 className="text-xl font-semibold mb-4">Create Custom QR Code</h2>
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Section (Table/Area)</label>
+          <label className="block text-gray-700 mb-2">Section/Purpose</label>
           <input
             type="text"
             name="section"
             value={qrCode.section}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded"
-            placeholder="e.g. Table 1, Bar Area"
+            placeholder="e.g. Front Door, Instagram Page"
             required
           />
         </div>
@@ -99,7 +112,7 @@ const QRCodeManagement = () => {
             value={qrCode.url}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded"
-            placeholder="https://your-website.com/menu"
+            placeholder="https://your-website.com"
             required
           />
         </div>
@@ -114,7 +127,7 @@ const QRCodeManagement = () => {
       </form>
       
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Generated QR Codes</h2>
+        <h2 className="text-2xl font-semibold mb-4">Generated Custom QR Codes</h2>
         
         {loading ? (
           <p>Loading QR codes...</p>
@@ -156,7 +169,7 @@ const QRCodeManagement = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center">No QR codes generated yet</p>
+          <p className="text-center">No custom QR codes generated yet</p>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, createUser, updateUser, deleteUser } from '../../services/api';
+import DashboardNav from '../../components/DashboardNav';
 
 const UserManagement = () => {
   const [user, setUser] = useState({
@@ -106,6 +107,7 @@ const UserManagement = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <DashboardNav />
       <h1 className="text-3xl font-bold mb-4">User Management</h1>
       
       {error && (
