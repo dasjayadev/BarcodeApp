@@ -148,7 +148,7 @@ export const deleteQRCode = (id) => api.delete(`/qrcodes/${id}`);
 
 // Table services
 export const getTables = () => api.get('/tables');
-export const getTable = (id) => api.get(`/tables/${id}`);
+export const getTable = (id) => publicApi.get(`/tables/public/${id}`);
 export const createTable = (table) => api.post('/tables', table);
 export const updateTable = (id, table) => api.put(`/tables/${id}`, table);
 export const deleteTable = (id) => api.delete(`/tables/${id}`);
