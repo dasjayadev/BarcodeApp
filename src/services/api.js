@@ -64,22 +64,24 @@ export const getCategories = () => api.get('/menu/categories');  // Updated path
 export const createMenuItem = (menuItem) => {
   const formData = new FormData();
   
-  // Append text fields - ensure all required fields are included
+  // Append text fields
   Object.keys(menuItem).forEach(key => {
-    if (key !== 'image') {
-      // Convert boolean values to strings for FormData
-      const value = typeof menuItem[key] === 'boolean' ? String(menuItem[key]) : menuItem[key];
-      formData.append(key, value !== undefined && value !== null ? value : '');
+    if (key !== 'image' && key !== 'dietaryInfo') {
+      formData.append(key, menuItem[key] !== undefined && menuItem[key] !== null ? menuItem[key] : '');
     }
   });
-  
-  // Append image if exists
-  if (menuItem.image instanceof File) {
-    formData.append('image', menuItem.image);
+
+  // Handle dietary info specifically - convert from nested object to flat fields
+  if (menuItem.dietaryInfo) {
+    Object.keys(menuItem.dietaryInfo).forEach(dietKey => {
+      formData.append(dietKey, menuItem.dietaryInfo[dietKey] ? 'true' : 'false');
+    });
   }
   
-  // Log form data for debugging
-  console.log('Sending form data:', Object.fromEntries(formData.entries()));
+  // Append image if exists
+  if (menuItem.image) {
+    formData.append('image', menuItem.image);
+  }
   
   return api.post('/menu', formData, {
     headers: {
@@ -90,22 +92,24 @@ export const createMenuItem = (menuItem) => {
 export const updateMenuItem = (id, menuItem) => {
   const formData = new FormData();
   
-  // Append text fields - ensure all required fields are included
+  // Append text fields
   Object.keys(menuItem).forEach(key => {
-    if (key !== 'image') {
-      // Convert boolean values to strings for FormData
-      const value = typeof menuItem[key] === 'boolean' ? String(menuItem[key]) : menuItem[key];
-      formData.append(key, value !== undefined && value !== null ? value : '');
+    if (key !== 'image' && key !== 'dietaryInfo') {
+      formData.append(key, menuItem[key] !== undefined && menuItem[key] !== null ? menuItem[key] : '');
     }
   });
-  
-  // Append image if exists
-  if (menuItem.image instanceof File) {
-    formData.append('image', menuItem.image);
+
+  // Handle dietary info specifically - convert from nested object to flat fields
+  if (menuItem.dietaryInfo) {
+    Object.keys(menuItem.dietaryInfo).forEach(dietKey => {
+      formData.append(dietKey, menuItem.dietaryInfo[dietKey] ? 'true' : 'false');
+    });
   }
   
-  // Log form data for debugging
-  console.log('Updating with form data:', Object.fromEntries(formData.entries()));
+  // Append image if exists
+  if (menuItem.image) {
+    formData.append('image', menuItem.image);
+  }
   
   return api.put(`/menu/${id}`, formData, {
     headers: {

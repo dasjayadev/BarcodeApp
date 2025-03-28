@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getMenuItems, getTable, createOrder } from '../services/api';
+import { getMenuItems, getTable, createOrder, getCategories } from '../services/api';
 
 const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [categoryMap, setCategoryMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,8 +34,8 @@ const Menu = () => {
   const tableId = new URLSearchParams(location.search).get('table');
   
   useEffect(() => {
-    // Fetch menu items
-    fetchMenuItems();
+    // Fetch menu items and categories
+    fetchData();
     
     // If table ID is provided, fetch table info
     if (tableId) {
@@ -42,20 +43,34 @@ const Menu = () => {
     }
   }, [tableId]);
   
-  const fetchMenuItems = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await getMenuItems();
-      setMenuItems(response.data);
       
-      // Extract unique categories
-      const uniqueCategories = [...new Set(response.data.map(item => item.category))];
-      setCategories(uniqueCategories);
+      // Fetch categories first
+      const categoriesResponse = await getCategories();
+      const categoryData = categoriesResponse.data;
+      
+      // Create a map of category IDs to names
+      const catMap = {};
+      categoryData.forEach(cat => {
+        catMap[cat._id] = cat.name;
+      });
+      setCategoryMap(catMap);
+      
+      // Then fetch menu items
+      const menuResponse = await getMenuItems();
+      setMenuItems(menuResponse.data);
+      
+      // Extract unique category IDs
+      const uniqueCategoryIds = [...new Set(menuResponse.data.map(item => item.category))];
+      setCategories(uniqueCategoryIds);
       
       setLoading(false);
     } catch (err) {
       setError('Failed to load menu items');
       setLoading(false);
+      console.error(err);
     }
   };
   
@@ -94,9 +109,10 @@ const Menu = () => {
   });
   
   // Group menu items by category
-  const menuItemsByCategory = categories.map(category => ({
-    category,
-    items: filteredMenuItems.filter(item => item.category === category)
+  const menuItemsByCategory = categories.map(categoryId => ({
+    categoryId,
+    categoryName: categoryMap[categoryId] || "Uncategorized",
+    items: filteredMenuItems.filter(item => item.category === categoryId)
   }));
   
   // Cart functions
@@ -249,10 +265,10 @@ const Menu = () => {
       ) : (
         <div className="grid grid-cols-1 gap-8">
           {/* Menu Categories */}
-          {menuItemsByCategory.map(({ category, items }) => (
+          {menuItemsByCategory.map(({ categoryId, categoryName, items }) => (
             items.length > 0 && (
-              <div key={category} className="category">
-                <h2 className="text-2xl font-semibold mb-4 pb-2 border-b">{category}</h2>
+              <div key={categoryId} className="category">
+                <h2 className="text-2xl font-semibold mb-4 pb-2 border-b">{categoryName}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {items.map(item => (
                     <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden">
