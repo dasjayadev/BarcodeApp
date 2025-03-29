@@ -110,6 +110,17 @@ router.put('/:id/status', auth, async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
     
+    // Check if order is locked
+    if (order.status === 'completed' && order.paymentStatus === 'paid') {
+      const lastUpdateTime = new Date(order.updatedAt);
+      const currentTime = new Date();
+      const minutesElapsed = (currentTime - lastUpdateTime) / (1000 * 60);
+      
+      if (minutesElapsed >= 5) {
+        return res.status(403).json({ message: 'Order is locked. No further changes allowed.' });
+      }
+    }
+    
     // Update order status
     order.status = status;
     
@@ -145,6 +156,17 @@ router.put('/:id/payment', auth, async (req, res) => {
     
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
+    }
+    
+    // Check if order is locked
+    if (order.status === 'completed' && order.paymentStatus === 'paid') {
+      const lastUpdateTime = new Date(order.updatedAt);
+      const currentTime = new Date();
+      const minutesElapsed = (currentTime - lastUpdateTime) / (1000 * 60);
+      
+      if (minutesElapsed >= 5) {
+        return res.status(403).json({ message: 'Order is locked. No further changes allowed.' });
+      }
     }
     
     order.paymentStatus = paymentStatus;

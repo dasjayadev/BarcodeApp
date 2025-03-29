@@ -45,10 +45,12 @@ const Navbar = () => {
             )}
             
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="relative inline-block text-left">
                 <button 
                   onClick={toggleDropdown}
                   className="flex items-center space-x-1 px-3 py-2 hover:text-blue-500 focus:outline-none"
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="true"
                 >
                   <span>{currentUser?.name || 'User'}</span>
                   <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
@@ -57,8 +59,7 @@ const Navbar = () => {
                 </button>
                 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                    {/* Add user profile link if needed */}
+                  <div className="origin-top-right absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <button 
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -104,14 +105,16 @@ const Navbar = () => {
               <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-100">Dashboard</Link>
             )}
             
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <button 
                 onClick={handleLogout}
                 className="block w-full text-left px-3 py-2 hover:bg-gray-100"
               >
-                Logout
+                Logout ({currentUser?.role || "User"})
               </button>
-            ) : (
+            )}
+            
+            {!isAuthenticated && (
               <Link to="/login" className="block px-3 py-2 hover:bg-gray-100">Login</Link>
             )}
           </div>
