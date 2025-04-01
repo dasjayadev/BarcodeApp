@@ -630,7 +630,7 @@ const MenuManagement = () => {
                                 <div>
                                   <h4 className="font-medium">{item.name}</h4>
                                   <div className="flex items-center">
-                                    <p className="text-sm text-gray-600">${parseFloat(item.price).toFixed(2)}</p>
+                                    <p className="text-sm text-gray-600">₹{parseFloat(item.price).toFixed(2)}</p>
                                     
                                     {/* Dietary icons */}
                                     {item.dietaryInfo && (

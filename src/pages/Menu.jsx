@@ -269,7 +269,7 @@ const Menu = () => {
             items.length > 0 && (
               <div key={categoryId} className="category">
                 <h2 className="text-2xl font-semibold mb-4 pb-2 border-b">{categoryName}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {items.map(item => (
                     <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden">
                       {item.image && (
@@ -282,7 +282,7 @@ const Menu = () => {
                       <div className="p-4">
                         <div className="flex justify-between items-center">
                           <h3 className="text-xl font-medium">{item.name}</h3>
-                          <p className="text-lg font-bold">${item.price.toFixed(2)}</p>
+                          <p className="text-lg font-bold">₹{item.price.toFixed(2)}</p>
                         </div>
                         <p className="text-gray-600 mt-2">{item.description}</p>
                         
@@ -327,7 +327,7 @@ const Menu = () => {
             <div className="flex justify-between items-center">
               <div>
                 <p className="font-semibold">{cart.length} item(s) in order</p>
-                <p className="text-lg font-bold">Total: ${calculateTotal().toFixed(2)}</p>
+                <p className="text-lg font-bold">Total: ₹{calculateTotal().toFixed(2)}</p>
               </div>
               <button 
                 className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
@@ -354,7 +354,7 @@ const Menu = () => {
                     <div className="flex items-center">
                       <div>
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-gray-600">${item.price.toFixed(2)} each</p>
+                        <p className="text-gray-600">₹{item.price.toFixed(2)} each</p>
                       </div>
                     </div>
                     <div className="flex items-center">
@@ -382,7 +382,7 @@ const Menu = () => {
                 ))}
               </div>
               <div className="border-t pt-2 mt-2">
-                <p className="text-lg font-bold">Total: ${calculateTotal().toFixed(2)}</p>
+                <p className="text-lg font-bold">Total: ₹{calculateTotal().toFixed(2)}</p>
               </div>
             </div>
             

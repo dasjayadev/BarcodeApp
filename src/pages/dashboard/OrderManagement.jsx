@@ -248,7 +248,7 @@ const OrderManagement = () => {
       {initialLoad && loading ? (
         <p className="text-center py-4">Loading orders...</p>
       ) : orders.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {orders.map(order => {
             // Check if order is locked
             const locked = isOrderLocked(order);
@@ -303,13 +303,13 @@ const OrderManagement = () => {
                     <ul className="list-disc list-inside">
                       {order.items.map((item, index) => (
                         <li key={index} className="ml-2">
-                          {item.quantity}x {item.menuItem?.name || 'Unknown Item'} - ${item.price.toFixed(2)}
+                          {item.quantity}x {item.menuItem?.name || 'Unknown Item'} - ₹{item.price.toFixed(2)}
                         </li>
                       ))}
                     </ul>
                   </div>
                   
-                  <p className="text-lg font-bold mt-2">Total: ${order.totalAmount.toFixed(2)}</p>
+                  <p className="text-lg font-bold mt-2">Total: ₹{order.totalAmount.toFixed(2)}</p>
                   
                   {order.notes && (
                     <div className="mt-2 p-2 bg-yellow-50 rounded">
