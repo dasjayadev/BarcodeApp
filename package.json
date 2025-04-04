@@ -10,13 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.1",
+    "@mui/material": "^7.0.1",
+    "@mui/styled-engine-sc": "^7.0.1",
     "@tailwindcss/vite": "^4.0.15",
+    "@yudiel/react-qr-scanner": "^2.2.1",
     "axios": "^1.8.4",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-qr-reader": "^3.0.0-beta-1",
     "react-router-dom": "^7.4.0",
+    "styled-components": "^6.1.17",
     "tailwindcss": "^4.0.15"
   },
   "devDependencies": {
