@@ -595,7 +595,7 @@ const MenuManagement = () => {
                       onClick={() => toggleCategory(category)}
                     >
                       <h3 className="text-lg font-medium">
-                        {categories.find(cat => cat._id === category)?.name || 'Uncategorized'} 
+                        {categories.find(cat => cat._id === category)?.name || 'No Category'} 
                         <span className="text-gray-500 ml-2 text-sm">
                           ({items.length} item{items.length !== 1 ? 's' : ''})
                         </span>

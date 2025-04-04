@@ -6,7 +6,7 @@ const NewDashboard = () => {
   return (
     <>
     <DashboardLayout>
-        <div>
+        <div style={{backgroundColor:"#f9fafb"}}>
             <DashboardTable />
         </div>
     </DashboardLayout>
