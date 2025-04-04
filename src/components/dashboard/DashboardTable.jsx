@@ -9,10 +9,13 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import PrintIcon from "@mui/icons-material/Print";
 import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
+import AddIcon from '@mui/icons-material/Add';
 
 import { getQRCodes, getTables, generateTableQR } from "../../services/api";
 
@@ -20,10 +23,13 @@ const API_BASE_URL = "http://localhost:5000"; // Adjust based on your setup
 
 const DashboardTable = () => {
   const [tables, setTables] = useState([]);
-
   const [restaurantQR, setRestaurantQR] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   const fetchTables = async () => {
     try {
@@ -46,10 +52,7 @@ const DashboardTable = () => {
   const fetchGlobalQRCode = async () => {
     try {
       setLoading(true);
-      // Fetch QR codes with type 'global'
       const response = await getQRCodes({ type: "global" });
-
-      // Find the Restaurant/Global Menu QR Code
       const globalMenuQR = response.data.find(
         (qr) =>
           qr.section === "Global Menu" || qr.section === "Restaurant QR Code"
@@ -69,7 +72,6 @@ const DashboardTable = () => {
   const handlePrint = () => {
     if (!restaurantQR) return;
 
-    // Create a new window with just the QR code image
     const printWindow = window.open("", "_blank");
     printWindow.document.write(`
       <html>
@@ -93,7 +95,6 @@ const DashboardTable = () => {
 
     printWindow.document.close();
     printWindow.focus();
-    // Use setTimeout to ensure content is loaded before printing
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
@@ -103,12 +104,9 @@ const DashboardTable = () => {
   const handleGenerateTableQR = async (tableId, tableNumber) => {
     try {
       setLoading(true);
-      // Get the base URL from the browser
       const baseUrl = window.location.origin;
       await generateTableQR(tableId, baseUrl);
       setLoading(false);
-
-      // Refresh tables to show the newly generated QR code
       fetchTables();
     } catch (err) {
       console.error("Failed to generate QR code:", err);
@@ -117,11 +115,9 @@ const DashboardTable = () => {
     }
   };
 
-  // Add this function for printing individual table QR codes
   const handlePrintTableQR = (table) => {
     if (!table.qrCode) return;
 
-    // Create a new window with just the QR code image
     const printWindow = window.open("", "_blank");
     printWindow.document.write(`
       <html>
@@ -145,7 +141,6 @@ const DashboardTable = () => {
 
     printWindow.document.close();
     printWindow.focus();
-    // Use setTimeout to ensure content is loaded before printing
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
@@ -154,19 +149,29 @@ const DashboardTable = () => {
 
   return (
     <>
-      <Box display='flex' gap={3} p={3}>
-        {/* QR Code Section */}
-        <Card sx={{ flex: 1, textAlign: "center", p: 3, borderRadius: 2 }}>
+      <Box 
+        display='flex' 
+        flexDirection={isMobile ? 'column' : 'row'} 
+        gap={2} 
+        p={isSmall ? 1 : 3} 
+        mt={isSmall ? 2 : 4}
+      >
+        <Card sx={{ 
+          flex: isMobile ? 'auto' : 1, 
+          textAlign: "center", 
+          p: isSmall ? 2 : 3, 
+          borderRadius: 2,
+          mb: isMobile ? 2 : 0
+        }}>
           <Box
             sx={{
               backgroundColor: "#f9f9f9",
               borderRadius: 2,
-              // p: 5,
               mb: 3,
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              minHeight: 200,
+              minHeight: isSmall ? 150 : 200,
             }}
           >
             {loading ? (
@@ -202,7 +207,7 @@ const DashboardTable = () => {
               Scan to access the restaurant menu
             </Typography>
           )}
-          <Box display='flex' justifyContent='center' gap={2} mt={2}>
+          <Box display='flex' flexWrap="wrap" justifyContent='center' gap={2} mt={2}>
             <Button
               variant='contained'
               color='primary'
@@ -213,6 +218,7 @@ const DashboardTable = () => {
               download={restaurantQR ? `restaurant-qr-code.png` : ""}
               target='_blank'
               rel='noopener noreferrer'
+              size={isSmall ? 'small' : 'medium'}
             >
               Download
             </Button>
@@ -221,36 +227,48 @@ const DashboardTable = () => {
               startIcon={<PrintIcon />}
               onClick={handlePrint}
               disabled={!restaurantQR}
+              size={isSmall ? 'small' : 'medium'}
             >
               Print
             </Button>
           </Box>
         </Card>
 
-        {/* Tables Section */}
         <Box
-          flex={2}
-          sx={{ borderRadius: 2, p: 3, backgroundColor: "#fff", boxShadow: 1 }}
+          flex={isMobile ? 'auto' : 2}
+          sx={{ 
+            borderRadius: 2, 
+            p: isSmall ? 2 : 3, 
+            backgroundColor: "#fff", 
+            boxShadow: 1,
+            overflow: 'hidden'
+          }}
         >
           <Box
             display='flex'
-            justifyContent='space-between'
-            alignItems='center'
+            flexDirection={isSmall ? 'column' : 'row'}
+            justifyContent={isSmall ? 'center' : 'space-between'}
+            alignItems={isSmall ? 'flex-start' : 'center'}
             mb={3}
+            gap={isSmall ? 2 : 0}
             width={"100%"}
           >
             <Typography variant='h6'>All Tables</Typography>
-            <Button variant='contained' color='primary'>
-              + Add Table
+            <Button 
+              variant='contained' 
+              color='primary'
+              size={isSmall ? 'small' : 'medium'}
+            >
+              <AddIcon /> &nbsp; Add Table
             </Button>
           </Box>
-          <Grid container spacing={3} justifyContent='space-between'>
+          <Grid container spacing={isSmall ? 2 : 3} justifyContent='space-between'>
             {tables.slice(0, 4).map((table) => (
               <Grid
                 item
                 xs={12}
                 sm={6}
-                md={3}
+                lg={3}
                 key={table._id}
                 sx={{ display: "flex" }}
               >
@@ -278,7 +296,7 @@ const DashboardTable = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         mb: 2,
-                        height: 50, // Fixed height for consistent layout
+                        height: 50,
                       }}
                       className='table-icon'
                     >
@@ -325,7 +343,6 @@ const DashboardTable = () => {
                   </CardContent>
                   <CardActions>
                     {table.qrCode ? (
-                      // For tables with QR codes, show download and print buttons
                       <Box
                         display='flex'
                         justifyContent='center'
@@ -355,7 +372,6 @@ const DashboardTable = () => {
                         </Button>
                       </Box>
                     ) : (
-                      // For tables without QR codes, show generate button
                       <Button
                         variant='outlined'
                         fullWidth
@@ -363,8 +379,9 @@ const DashboardTable = () => {
                         onClick={() =>
                           handleGenerateTableQR(table._id, table.tableNumber)
                         }
+                        size={isSmall ? 'small' : 'medium'}
                       >
-                        Generate QR
+                        {isSmall ? 'QR' : 'Generate QR'}
                       </Button>
                     )}
                   </CardActions>
@@ -374,7 +391,7 @@ const DashboardTable = () => {
 
             {tables.length > 4 && (
               <Grid item xs={12} sx={{ mt: 2, textAlign: "center" }}>
-                <Button variant='outlined' color='primary'>
+                <Button variant='outlined' color='primary' size={isSmall ? 'small' : 'medium'}>
                   View All Tables ({tables.length})
                 </Button>
               </Grid>

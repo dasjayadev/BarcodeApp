@@ -25,7 +25,7 @@ const Navbar = () => {
   const isStaff = currentUser && ['owner', 'manager', 'staff'].includes(currentUser.role);
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md fixed w-full z-10">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -95,7 +95,7 @@ const Navbar = () => {
         
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-3">
+          <div className="md:hidden py-3 ">
             <Link to="/" className="block px-3 py-2 hover:bg-gray-100">Home</Link>
             <Link to="/menu" className="block px-3 py-2 hover:bg-gray-100">Menu</Link>
             <Link to="/offers" className="block px-3 py-2 hover:bg-gray-100">Offers</Link>

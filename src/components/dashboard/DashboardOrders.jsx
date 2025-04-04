@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { getOrders } from "../../services/api";
-
 import {
   Box,
   Card,
@@ -12,15 +11,23 @@ import {
   Grid,
   Paper,
   Stack,
-    Button,
+  Button,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import TableBarIcon from "@mui/icons-material/TableBar";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 
 const DashboardOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Add responsive hooks
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -50,67 +57,62 @@ const DashboardOrders = () => {
   const renderOrderCard = (order) => (
     <Card
       key={order._id}
-      variant='outlined'
+      variant="outlined"
       sx={{
         mb: 2,
-        transition: "box-shadow 0.3s ease",
-        "&:hover": {
-          boxShadow: 4,
-        },
+        borderRadius: 1,
       }}
     >
-      <CardContent>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 1,
-          }}
-        >
-          <Typography variant='h6'>
+      <CardContent sx={{ p: isSmall ? 1.5 : 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+          <Typography variant={isSmall ? "body1" : "h6"} fontWeight="bold">
             Order #{order._id.substring(order._id.length - 4)}
           </Typography>
           <Chip
-            label={order.paymentStatus || "unpaid"}
-            size='small'
+            size={isSmall ? "small" : "medium"}
+            label={order.paymentStatus === "paid" ? "Paid" : "Unpaid"}
             color={order.paymentStatus === "paid" ? "success" : "error"}
           />
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-          <Typography variant='body1' fontWeight='medium'>
-            {order.items.length} items
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            •
-          </Typography>
-          <Typography variant='body1' fontWeight='medium'>
-            ₹{order.totalAmount.toFixed(2)}
-          </Typography>
-        </Box>
-
-        <Stack direction='column' spacing={0.5}>
+        <Stack direction="column" spacing={0.5} mb={1}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <ScheduleIcon
-              fontSize='small'
-              sx={{ mr: 0.5, color: "text.secondary" }}
-            />
-            <Typography variant='body2' color='text.secondary'>
-              {new Date(order.createdAt).toLocaleTimeString()}
+            <>
+              <ScheduleIcon
+                fontSize="small"
+                sx={{ mr: 0.5, color: "text.secondary" }}
+              />
+              <Typography variant="body2" color="text.secondary" mr={0.5}>
+                {new Date(order.createdAt).toLocaleTimeString()}
+              </Typography>
+            </>
+            <Typography variant="body2" color="text.secondary">
+              {new Date(order.createdAt).toLocaleDateString()}
             </Typography>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <TableBarIcon
-              fontSize='small'
+              fontSize="small"
               sx={{ mr: 0.5, color: "text.secondary" }}
             />
-            <Typography variant='body2' color='text.secondary'>
+            <Typography variant="body2" color="text.secondary">
               Table #{order.table?.tableNumber || "N/A"}
             </Typography>
           </Box>
         </Stack>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="body1" fontWeight="medium">
+            {order.items.length} items
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            •
+          </Typography>
+          <Typography variant="body1" fontWeight="medium">
+            ₹{order.totalAmount.toFixed(2)}
+          </Typography>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -131,7 +133,7 @@ const DashboardOrders = () => {
   }
 
   if (error) {
-    return <Alert severity='error'>{error}</Alert>;
+    return <Alert severity="error">{error}</Alert>;
   }
 
   const pendingOrders = groupOrdersByStatus("pending");
@@ -141,30 +143,52 @@ const DashboardOrders = () => {
 
   return (
     <Box sx={{ overflow: "hidden" }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
-        <Typography variant='h4' fontWeight='bold'>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          justifyContent: "space-between",
+          alignItems: isMobile ? "flex-start" : "center",
+          mb: 3,
+          p: isSmall ? "0 8px" : "0 16px",
+          gap: isMobile ? 2 : 0,
+        }}
+      >
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          fontSize={isMobile ? "1.5rem" : "2rem"}
+        >
           Order Status Board
         </Typography>
-        <Button variant='contained' color='primary'>
-          + Manage Orders
+        <Button
+          variant="contained"
+          color="primary"
+          size={isSmall ? "small" : "medium"}
+        >
+          <AssignmentIcon /> &nbsp; Manage Orders
         </Button>
       </Box>
 
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 2,
-          padding: "0 16px",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+            md: "repeat(4, 1fr)",
+          },
+          gap: isSmall ? 1 : 2,
+          padding: isSmall ? "0 8px" : "0 16px",
         }}
       >
         {/* Pending Orders */}
         <Paper
-          variant='outlined'
+          variant="outlined"
           sx={{
-            p: 2,
+            p: isSmall ? 1 : 2,
             backgroundColor: "#fff8f0",
-            height: "100%",
+            height: "90%",
             display: "flex",
             flexDirection: "column",
           }}
@@ -179,13 +203,13 @@ const DashboardOrders = () => {
                 mr: 1,
               }}
             />
-            <Typography variant='h6' color='#b54708'>
+            <Typography variant="h6" color="#b54708">
               Pending
             </Typography>
             <Chip
               label={pendingOrders.length}
-              size='small'
-              color='warning'
+              size="small"
+              color="warning"
               sx={{ ml: "auto" }}
             />
           </Box>
@@ -202,7 +226,7 @@ const DashboardOrders = () => {
             </Box>
           ) : (
             <Paper
-              variant='outlined'
+              variant="outlined"
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -217,11 +241,11 @@ const DashboardOrders = () => {
 
         {/* Preparing Orders */}
         <Paper
-          variant='outlined'
+          variant="outlined"
           sx={{
-            p: 2,
+            p: isSmall ? 1 : 2,
             backgroundColor: "#f0f7ff",
-            height: "100%",
+            height: "90%",
             display: "flex",
             flexDirection: "column",
           }}
@@ -236,13 +260,13 @@ const DashboardOrders = () => {
                 mr: 1,
               }}
             />
-            <Typography variant='h6' color='#0a4b78'>
+            <Typography variant="h6" color="#0a4b78">
               Preparing
             </Typography>
             <Chip
               label={preparingOrders.length}
-              size='small'
-              color='info'
+              size="small"
+              color="info"
               sx={{ ml: "auto" }}
             />
           </Box>
@@ -259,7 +283,7 @@ const DashboardOrders = () => {
             </Box>
           ) : (
             <Paper
-              variant='outlined'
+              variant="outlined"
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -274,11 +298,11 @@ const DashboardOrders = () => {
 
         {/* Served Orders */}
         <Paper
-          variant='outlined'
+          variant="outlined"
           sx={{
-            p: 2,
+            p: isSmall ? 1 : 2,
             backgroundColor: "#fff0f7",
-            height: "100%",
+            height: "90%",
             display: "flex",
             flexDirection: "column",
           }}
@@ -293,13 +317,13 @@ const DashboardOrders = () => {
                 mr: 1,
               }}
             />
-            <Typography variant='h6' color='#9a1146'>
+            <Typography variant="h6" color="#9a1146">
               Served
             </Typography>
             <Chip
               label={servedOrders.length}
-              size='small'
-              color='secondary'
+              size="small"
+              color="secondary"
               sx={{ ml: "auto" }}
             />
           </Box>
@@ -316,7 +340,7 @@ const DashboardOrders = () => {
             </Box>
           ) : (
             <Paper
-              variant='outlined'
+              variant="outlined"
               sx={{
                 p: 3,
                 textAlign: "center",
@@ -331,11 +355,11 @@ const DashboardOrders = () => {
 
         {/* Completed Orders */}
         <Paper
-          variant='outlined'
+          variant="outlined"
           sx={{
-            p: 2,
+            p: isSmall ? 1 : 2,
             backgroundColor: "#f0fdf4",
-            height: "100%",
+            height: "90%",
             display: "flex",
             flexDirection: "column",
           }}
@@ -350,13 +374,13 @@ const DashboardOrders = () => {
                 mr: 1,
               }}
             />
-            <Typography variant='h6' color='#166534'>
+            <Typography variant="h6" color="#166534">
               Completed
             </Typography>
             <Chip
               label={completedOrders.length}
-              size='small'
-              color='success'
+              size="small"
+              color="success"
               sx={{ ml: "auto" }}
             />
           </Box>
@@ -373,7 +397,7 @@ const DashboardOrders = () => {
             </Box>
           ) : (
             <Paper
-              variant='outlined'
+              variant="outlined"
               sx={{
                 p: 3,
                 textAlign: "center",
