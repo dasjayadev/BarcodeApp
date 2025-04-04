@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { QrReader } from 'react-qr-reader';
 
 const Home = () => {
-  const [scanResult, setScanResult] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showScanner, setShowScanner] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,20 +11,12 @@ const Home = () => {
     setIsAuthenticated(!!token);
   }, []);
 
-  const handleScan = (data) => {
-    if (data) {
-      setScanResult(data?.text || data);
-      // Redirect to the menu page after successful scan
-      navigate('/menu');
-    }
-  };
-
-  const handleError = (err) => {
-    console.error(err);
-  };
-
   const handleLoginRedirect = () => {
     navigate('/login');
+  };
+
+  const handleViewMenu = () => {
+    navigate('/menu');
   };
 
   return (
@@ -35,7 +24,7 @@ const Home = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">Welcome to Barcode App</h1>
-          <p className="text-xl text-gray-600 mb-6">Scan QR codes to view our digital menu and special offers</p>
+          <p className="text-xl text-gray-600 mb-6">View our digital menu and special offers</p>
         </div>
         
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -53,46 +42,16 @@ const Home = () => {
               </div>
             </div>
           ) : (
-            <>
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-semibold mb-2">QR Code Scanner</h2>
-                <p className="text-gray-600 mb-6">Scan a QR code to view our menu</p>
-                
-                {!showScanner && (
-                  <button
-                    onClick={() => setShowScanner(true)}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition duration-300"
-                  >
-                    Start Scanner
-                  </button>
-                )}
-              </div>
-              
-              {showScanner && (
-                <div className="max-w-md mx-auto">
-                  <QrReader
-                    constraints={{ facingMode: 'environment' }}
-                    delay={300}
-                    onError={handleError}
-                    onResult={handleScan}
-                    style={{ width: '100%' }}
-                  />
-                  <button
-                    onClick={() => setShowScanner(false)}
-                    className="mt-4 px-6 py-2 bg-gray-600 text-white rounded-md font-medium hover:bg-gray-700 transition duration-300"
-                  >
-                    Cancel Scanning
-                  </button>
-                </div>
-              )}
-              
-              {scanResult && (
-                <div className="mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
-                  <p className="font-semibold">Successfully scanned!</p>
-                  <p>Redirecting to menu...</p>
-                </div>
-              )}
-            </>
+            <div className="text-center py-8">
+              <h2 className="text-2xl font-semibold mb-4">Browse Our Menu</h2>
+              <p className="text-gray-600 mb-6">Check out our delicious food options</p>
+              <button
+                onClick={handleViewMenu}
+                className="px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition duration-300"
+              >
+                View Menu
+              </button>
+            </div>
           )}
         </div>
         

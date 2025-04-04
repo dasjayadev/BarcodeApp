@@ -17,6 +17,7 @@ import QRCodeManagement from './pages/dashboard/QRCodeManagement';
 import TableManagement from './pages/dashboard/TableManagement';
 import OrderManagement from './pages/dashboard/OrderManagement';
 import Settings from './pages/dashboard/Settings';
+import NewDashboard from './pages/NewDashboard';
 
 // Protected route component
 const ProtectedRoute = ({ children, requiredRoles = [] }) => {
@@ -55,6 +56,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path='/new' element={<NewDashboard/>} />
           
           {/* Protected routes */}
           <Route path="/dashboard" element={

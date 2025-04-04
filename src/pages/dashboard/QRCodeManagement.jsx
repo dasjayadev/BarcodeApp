@@ -1,55 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getQRCodes, createQRCode, deleteQRCode } from '../../services/api';
+import { getQRCodes, deleteQRCode, createGlobalMenuQR } from '../../services/api';
 import DashboardNav from '../../components/DashboardNav';
 
 const QRCodeManagement = () => {
-  const [qrCode, setQRCode] = useState({
-    section: '',
-    url: ''
-  });
-  const [qrCodes, setQRCodes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  // Restaurant menu QR specific state
+  const [restaurantQR, setRestaurantQR] = useState(null);
 
   useEffect(() => {
-    fetchQRCodes();
+    fetchGlobalQRCode();
   }, []);
 
-  const fetchQRCodes = async () => {
+  const fetchGlobalQRCode = async () => {
     try {
       setLoading(true);
-      // Only fetch global QR codes here - table QR codes are managed in TableManagement
+      // Only fetch global QR codes
       const response = await getQRCodes({ type: 'global' });
-      setQRCodes(response.data);
+      
+      // Find restaurant menu QR if it exists
+      const menuQR = response.data.find(qr => 
+        qr.section === 'Global Menu' || qr.section === 'Restaurant QR Code'
+      );
+      
+      if (menuQR) {
+        setRestaurantQR(menuQR);
+      }
+      
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch QR codes');
+      setError('Failed to fetch QR code');
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setQRCode((prevQRCode) => ({
-      ...prevQRCode,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleGenerateMenuQR = async () => {
     setError('');
     setSuccess('');
+    setGenerating(true);
     
     try {
-      await createQRCode(qrCode);
-      setSuccess('QR Code generated successfully');
-      setQRCode({ section: '', url: '' });
-      fetchQRCodes();
+      // Get the base URL from the browser
+      const baseUrl = window.location.origin;
+      await createGlobalMenuQR(baseUrl);
+      setSuccess('Restaurant Menu QR Code generated successfully');
+      fetchGlobalQRCode(); // Refresh to show the new QR
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to generate QR code');
+      setError(err.response?.data?.message || 'Failed to generate restaurant menu QR code');
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -58,118 +60,128 @@ const QRCodeManagement = () => {
       try {
         await deleteQRCode(id);
         setSuccess('QR Code deleted successfully');
-        fetchQRCodes();
+        setRestaurantQR(null);
+        fetchGlobalQRCode();
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to delete QR code');
       }
     }
   };
 
+  // Helper function to print a QR code
+  const handlePrint = (qrCode) => {
+    if (!qrCode) return;
+    
+    const printWindow = window.open('', '_blank');
+    const API_BASE_URL = "http://localhost:5000"; // Adjust based on your setup
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Restaurant QR Code</title>
+          <style>
+            body { display: flex; justify-content: center; align-items: center; height: 100vh; }
+            img { max-width: 300px; }
+            .container { text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h2>${qrCode.section}</h2>
+            <img src="${API_BASE_URL}${qrCode.code}" />
+            <p>Scan to access our restaurant menu</p>
+          </div>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <DashboardNav />
-      <h1 className="text-3xl font-bold mb-4">QR Code Management</h1>
+      <h1 className="text-3xl font-bold text-center mb-6">Restaurant QR Code Management</h1>
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 max-w-lg mx-auto">
           {error}
         </div>
       )}
       
       {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 max-w-lg mx-auto">
           {success}
         </div>
       )}
       
-      <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded">
-        <h2 className="text-lg font-medium mb-2">Table QR Codes</h2>
-        <p className="mb-4">Want to generate QR codes for restaurant tables? Go to Table Management to create table-specific QR codes.</p>
-        <Link to="/dashboard/tables" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-          Go to Table Management
-        </Link>
-      </div>
-      
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto mb-8">
-        <h2 className="text-xl font-semibold mb-4">Create Custom QR Code</h2>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Section/Purpose</label>
-          <input
-            type="text"
-            name="section"
-            value={qrCode.section}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="e.g. Front Door, Instagram Page"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">URL</label>
-          <input
-            type="text"
-            name="url"
-            value={qrCode.url}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="https://your-website.com"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <button 
-            type="submit" 
-            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Generate QR Code
-          </button>
-        </div>
-      </form>
-      
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Generated Custom QR Codes</h2>
+      {/* Restaurant Menu QR Code Section */}
+      <div className="max-w-lg mx-auto p-6 border rounded-lg bg-white shadow-md">
+        <h2 className="text-xl font-semibold mb-4 text-center">Global Restaurant Menu QR Code</h2>
+        <p className="text-gray-600 mb-6 text-center">
+          Generate a QR code that customers can scan to view your restaurant's full menu.
+          This QR code can be printed and placed on tables or at the entrance.
+        </p>
         
         {loading ? (
-          <p>Loading QR codes...</p>
-        ) : qrCodes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {qrCodes.map(qrCode => (
-              <div key={qrCode._id} className="bg-white p-4 rounded shadow">
-                <h3 className="font-semibold text-lg mb-2">{qrCode.section}</h3>
-                <p className="text-gray-600 mb-2 truncate">{qrCode.url}</p>
-                
-                {qrCode.code && (
-                  <div className="mb-3">
-                    <img 
-                      src={qrCode.code.startsWith('/') ? `http://localhost:5000${qrCode.code}` : qrCode.code}
-                      alt="QR Code" 
-                      className="mx-auto w-48 h-48"
-                    />
-                  </div>
-                )}
-                
-                <div className="flex justify-between">
-                  <a 
-                    href={qrCode.code.startsWith('/') ? `http://localhost:5000${qrCode.code}` : qrCode.code}
-                    download={`qr-${qrCode.section}.png`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Download
-                  </a>
-                  <button
-                    onClick={() => handleDelete(qrCode._id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p>Loading QR code...</p>
+          </div>
+        ) : restaurantQR ? (
+          <div className="text-center">
+            <div className="bg-gray-50 p-6 rounded-lg mb-4">
+              <img 
+                src={restaurantQR.code.startsWith('/') ? `http://localhost:5000${restaurantQR.code}` : restaurantQR.code}
+                alt="Restaurant Menu QR Code" 
+                className="mx-auto w-64 h-64"
+              />
+            </div>
+            <p className="text-gray-700 mb-5">
+              This QR code will direct customers to your restaurant's full digital menu.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-4">
+              <a 
+                href={restaurantQR.code.startsWith('/') ? `http://localhost:5000${restaurantQR.code}` : restaurantQR.code}
+                download="restaurant-menu-qr.png"
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              >
+                Download QR Code
+              </a>
+              <button
+                onClick={() => handlePrint(restaurantQR)}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+              >
+                Print QR Code
+              </button>
+              <button
+                onClick={() => handleDelete(restaurantQR._id)}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+              >
+                Delete & Regenerate
+              </button>
+            </div>
           </div>
         ) : (
-          <p className="text-center">No custom QR codes generated yet</p>
+          <div className="text-center py-8">
+            <div className="bg-blue-50 p-6 rounded-lg mb-6">
+              <p className="mb-4">No restaurant menu QR code found. Generate one now!</p>
+              <button 
+                onClick={handleGenerateMenuQR}
+                disabled={generating}
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition"
+              >
+                {generating ? 'Generating...' : 'Generate Restaurant Menu QR'}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
