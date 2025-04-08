@@ -65,7 +65,10 @@ const DashboardOrders = () => {
     >
       <CardContent sx={{ p: isSmall ? 1.5 : 2 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-          <Typography variant={isSmall ? "body1" : "h6"} fontWeight="bold">
+          <Typography
+            variant={isSmall ? "body1" : "h6"}
+            sx={{ fontWeight: "600", fontSize: "1rem" }}
+          >
             Order #{order._id.substring(order._id.length - 4)}
           </Typography>
           <Chip
