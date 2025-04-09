@@ -33,13 +33,54 @@ const Navbar = () => {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/" className="px-3 py-2 hover:text-blue-500">Home</Link>
-            <Link to="/menu" className="px-3 py-2 hover:text-blue-500">Menu</Link>
-            <Link to="/offers" className="px-3 py-2 hover:text-blue-500">Offers</Link>
-            <Link to="/about" className="px-3 py-2 hover:text-blue-500">About</Link>
+            <Link 
+              to="/" 
+              className="px-3 py-2 hover:text-orange-500 rounded" 
+              //style={{ transition: 'color 0.3s' }}
+              //onMouseEnter={(e) => e.target.style.color = '#F57400'}
+             // onMouseLeave={(e) => e.target.style.color = ''}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/menu" 
+              className="px-3 py-2" 
+              style={{ transition: 'color 0.3s' }}
+              onMouseEnter={(e) => e.target.style.color = '#F57400'}
+              onMouseLeave={(e) => e.target.style.color = ''}
+            >
+              Menu
+            </Link>
+            <Link 
+              to="/offers" 
+              className="px-3 py-2" 
+              style={{ transition: 'color 0.3s' }}
+              onMouseEnter={(e) => e.target.style.color = '#F57400'}
+              onMouseLeave={(e) => e.target.style.color = ''}
+            >
+              Offers
+            </Link>
+            <Link 
+              to="/about" 
+              className="px-3 py-2" 
+              style={{ transition: 'color 0.3s' }}
+              onMouseEnter={(e) => e.target.style.color = '#F57400'}
+              onMouseLeave={(e) => e.target.style.color = ''}
+            >
+              About
+            </Link>
             
             {isAuthenticated && isStaff && (
-              <Link to="/dashboard" className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+              <Link 
+                to="/dashboard" 
+                className="px-3 py-2 text-white rounded" 
+                style={{ 
+                  backgroundColor: '#F57400', 
+                  transition: 'background-color 0.3s' 
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#FF8753'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#F57400'}
+              >
                 Dashboard
               </Link>
             )}
@@ -48,7 +89,10 @@ const Navbar = () => {
               <div className="relative inline-block text-left">
                 <button 
                   onClick={toggleDropdown}
-                  className="flex items-center space-x-1 px-3 py-2 hover:text-blue-500 focus:outline-none"
+                  className="flex items-center space-x-1 px-3 py-2  focus:outline-none"
+                  style={{ transition: 'color 0.3s' }}
+                  onMouseEnter={(e) => e.target.style.color = '#F57400'}
+                  onMouseLeave={(e) => e.target.style.color = ''}
                   aria-expanded={dropdownOpen}
                   aria-haspopup="true"
                 >
@@ -102,7 +146,18 @@ const Navbar = () => {
             <Link to="/about" className="block px-3 py-2 hover:bg-gray-100">About</Link>
             
             {isAuthenticated && isStaff && (
-              <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-100">Dashboard</Link>
+              <Link 
+                to="/dashboard" 
+                className="block px-3 py-2 hover:bg-gray-100" 
+                style={{ 
+                  backgroundColor: '#F57400', 
+                  transition: 'background-color 0.3s' 
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#FF8753'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#F57400'}
+              >
+                Dashboard
+              </Link>
             )}
             
             {isAuthenticated && (

@@ -210,7 +210,7 @@ const DashboardTable = () => {
           <Box display='flex' flexWrap="wrap" justifyContent='center' gap={2} mt={2}>
             <Button
               variant='contained'
-              color='primary'
+             
               startIcon={<DownloadIcon />}
               disabled={!restaurantQR}
               component='a'
@@ -219,6 +219,7 @@ const DashboardTable = () => {
               target='_blank'
               rel='noopener noreferrer'
               size={isSmall ? 'small' : 'medium'}
+              sx={{ backgroundColor:"#F57400", '&:hover': { backgroundColor: "#FF8753" } }}
             >
               Download
             </Button>
@@ -228,6 +229,7 @@ const DashboardTable = () => {
               onClick={handlePrint}
               disabled={!restaurantQR}
               size={isSmall ? 'small' : 'medium'}
+              
             >
               Print
             </Button>
@@ -256,7 +258,7 @@ const DashboardTable = () => {
             <Typography variant='h6'>All Tables</Typography>
             <Button 
               variant='contained' 
-              color='primary'
+              sx={{ backgroundColor:"#F57400", '&:hover': { backgroundColor: "#FF8753" } }}
               size={isSmall ? 'small' : 'medium'}
             >
               <AddIcon /> &nbsp; Add Table
@@ -351,14 +353,13 @@ const DashboardTable = () => {
                       >
                         <Button
                           variant='contained'
-                          color='primary'
                           component='a'
                           href={`${API_BASE_URL}${table.qrCode.code}`}
                           download={`table-${table.tableNumber}-qr-code.png`}
                           target='_blank'
                           rel='noopener noreferrer'
                           size='small'
-                          sx={{ flex: 1 }}
+                          sx={{ backgroundColor:"#F57400", '&:hover': { backgroundColor: "#FF8753" }, flex: 1 }}
                         >
                           <DownloadIcon />
                         </Button>
