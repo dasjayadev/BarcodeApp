@@ -166,8 +166,8 @@ const DashboardOrders = () => {
         </Typography>
         <Button
           variant="contained"
-          color="primary"
           size={isSmall ? "small" : "medium"}
+          sx={{ backgroundColor:"#F57400", '&:hover': { backgroundColor: "#FF8753" } }}
         >
           <AssignmentIcon /> &nbsp; Manage Orders
         </Button>
