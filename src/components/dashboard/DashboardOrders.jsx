@@ -153,7 +153,7 @@ const DashboardOrders = () => {
           justifyContent: "space-between",
           alignItems: isMobile ? "flex-start" : "center",
           mb: 3,
-          p: isSmall ? "0 8px" : "0 16px",
+          padding: isSmall ? "0 8px" : "0 16px",
           gap: isMobile ? 2 : 0,
         }}
       >

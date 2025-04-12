@@ -41,7 +41,7 @@ const DashboardTable = () => {
       console.error("Failed to fetch tables:", err);
       setError(err.response?.data?.message || "Failed to load tables");
       setLoading(false);
-    }
+    } 
   };
 
   useEffect(() => {
