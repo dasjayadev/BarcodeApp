@@ -3,6 +3,7 @@ import DashboardLayout from '../components/Layout/DashboardLayout'
 import DashboardTable from '../components/dashboard/DashboardTable'
 import DashboardOrders from '../components/dashboard/DashboardOrders'
 import DashboardMenu from '../components/dashboard/DashboardMenu'
+import DashboardStaff from '../components/dashboard/DashboardStaff'
 import { Box, useTheme, useMediaQuery } from '@mui/material'
 
 const NewDashboard = () => {
@@ -23,6 +24,7 @@ const NewDashboard = () => {
         <DashboardTable />
         <DashboardOrders />
         <DashboardMenu />
+        <DashboardStaff />
       </Box>
     </DashboardLayout>
   )

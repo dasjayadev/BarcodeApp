@@ -46,7 +46,10 @@ const Login = () => {
       // Redirect based on user role
       if (response.data.user.role === 'owner' || response.data.user.role === 'manager') {
         navigate('/dashboard');
-      } else {
+      }else if(response.data.user.role === 'staff'){
+        navigate('/dashboard/orders');
+      }
+       else {
         navigate('/');
       }
     } catch (err) {
