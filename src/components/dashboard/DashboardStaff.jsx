@@ -6,7 +6,7 @@ const DashboardStaff = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [users, setUsers] = useState([])
 
-  console.log(isMobile)
+  
 
   useEffect(() => {
     const fetchUsers = async () => {
