@@ -56,7 +56,8 @@ const DashboardMenu = () => {
   const handleNavigate = () => {
     Navigate("/add-items");
   };
-  console.log(menu)
+  // Uncomment the following line for debugging in development mode only
+  // if (process.env.NODE_ENV === 'development') console.log(menu);
   return (
     <Box
       sx={{
