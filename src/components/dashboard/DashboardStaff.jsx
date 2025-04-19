@@ -20,9 +20,6 @@ const DashboardStaff = () => {
     fetchUsers();
   }, []);
 
-  console.log(users)
-
-
   return (
     <div>DashboardStaff</div>
   )
