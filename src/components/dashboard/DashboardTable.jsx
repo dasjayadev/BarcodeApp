@@ -104,10 +104,9 @@ const DashboardTable = () => {
     }, 250);
   };
 
-  const handleGenerateTableQR = async (tableId) => {
+  const handleGenerateTableQR = async (tableId, baseUrl) => {
     try {
       setLoading(true);
-      const baseUrl = window.location.origin;
       await generateTableQR(tableId, baseUrl);
       setLoading(false);
       fetchTables();
