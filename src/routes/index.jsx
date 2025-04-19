@@ -15,8 +15,7 @@ import QRCodeManagement from '../pages/dashboard/QRCodeManagement';
 import TableManagement from '../pages/dashboard/TableManagement';
 import OrderManagement from '../pages/dashboard/OrderManagement';
 import Settings from '../pages/dashboard/Settings';
-import NewDashboard from '../pages/NewDashboard';
-
+import OldDashboard from '../pages/OldDashboard';
 // Protected route component
 export const ProtectedRoute = ({ children, requiredRoles = [] }) => {
   const token = localStorage.getItem('authToken');
@@ -50,7 +49,7 @@ export const publicRoutes = [
   { path: '/login', element: <Login /> },
   { path: '/forgot-password', element: <ForgotPassword /> },
   { path: '/reset-password', element: <ResetPassword /> },
-  { path: '/new', element: <NewDashboard /> },
+  { path: '/old', element: <OldDashboard /> },
 ];
 
 // Protected routes
