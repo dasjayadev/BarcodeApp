@@ -18,6 +18,7 @@ import {
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import TableBarIcon from "@mui/icons-material/TableBar";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import { CircleDashed } from "lucide-react";
 
 const DashboardOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -130,7 +131,7 @@ const DashboardOrders = () => {
           minHeight: 200,
         }}
       >
-        <CircularProgress />
+        <CircleDashed size={40} className="animate animate-spin text-orange-500" />
       </Box>
     );
   }

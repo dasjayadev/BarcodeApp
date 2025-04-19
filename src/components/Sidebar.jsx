@@ -8,7 +8,6 @@ import {
   Divider,
   Menu,
   MenuItem,
-  Typography,
   IconButton,
   Tooltip,
 } from "@mui/material";
@@ -25,16 +24,13 @@ import {
   ChevronRight as ExpandIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Sidebar = ({ isExpanded, toggleSidebar }) => {
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
-  // Example user data - in a real app, this would come from authentication context
-  const user = {
-    name: "John Doe",
-  };
 
   const handleUserClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -45,38 +41,43 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
   };
 
   const handleLogout = () => {
-    // Implement logout functionality here
-    handleClose();
+    logout();
+    navigate("/login");
   };
 
   const handleNavigation = (path) => {
     navigate(path);
   };
 
+  // Navigation items with role-based access
   const navigationItems = [
-    { text: "Orders", icon: <OrdersIcon />, path: "/orders" },
-    { text: "Table Management", icon: <TableIcon />, path: "/tables" },
-    { text: "Menu Management", icon: <MenuIcon />, path: "/menu" },
-    { text: "Offers Management", icon: <OffersIcon />, path: "/offers" },
-    { text: "User Management", icon: <UserManagementIcon />, path: "/users" },
+    { text: "Orders", icon: <OrdersIcon />, path: "/dashboard/orders", roles: ["owner", "manager", "staff"] },
+    { text: "Table Management", icon: <TableIcon />, path: "/dashboard/tables", roles: ["owner", "manager"] },
+    { text: "Menu Management", icon: <MenuIcon />, path: "/dashboard/menu", roles: ["owner", "manager"] },
+    { text: "Offers Management", icon: <OffersIcon />, path: "/dashboard/offers", roles: ["owner", "manager"] },
+    { text: "User Management", icon: <UserManagementIcon />, path: "/dashboard/users", roles: ["owner"] },
   ];
+
+  // Filter navigation items based on the user's role
+  const filteredNavigationItems = navigationItems.filter((item) =>
+    item.roles.includes(currentUser?.role)
+  );
 
   return (
     <Box
       sx={{
         width: isExpanded ? 220 : 70,
         bgcolor: "background.paper",
-        height: "calc(100vh - 64px)", // Changed from 100vh to account for navbar height
+        height: "calc(100vh - 64px)", // Adjusted for navbar height
         display: "flex",
         flexDirection: "column",
         borderRight: "1px solid",
         borderColor: "divider",
         transition: "width 0.3s ease",
         position: "fixed",
-        top: "64px", // This correctly positions it below the navbar
+        top: "64px", // Positioned below the navbar
         left: 0,
         zIndex: 8,
-        // overflow: 'hidden'
       }}
     >
       {/* Toggle Button */}
@@ -94,11 +95,11 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
 
       {/* Navigation Items */}
       <List>
-        {navigationItems.map((item) => (
+        {filteredNavigationItems.map((item) => (
           <Tooltip
             key={item.text}
             title={!isExpanded ? item.text : ""}
-            placement='right'
+            placement="right"
           >
             <ListItem
               button
@@ -126,7 +127,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
       {/* Bottom Section */}
       <Box sx={{ mt: "auto", p: 2 }}>
         <Divider sx={{ mb: 1 }} />
-        <Tooltip title={!isExpanded ? "Settings" : ""} placement='right'>
+        <Tooltip title={!isExpanded ? "Settings" : ""} placement="right">
           <ListItem
             button
             onClick={() => handleNavigation("/settings")}
@@ -144,11 +145,11 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             <ListItemIcon sx={{ minWidth: isExpanded ? "36px" : "24px" }}>
               <SettingsIcon />
             </ListItemIcon>
-            {isExpanded && <ListItemText primary='Settings' />}
+            {isExpanded && <ListItemText primary="Settings" />}
           </ListItem>
         </Tooltip>
 
-        <Tooltip title={!isExpanded ? user.name : ""} placement='right'>
+        <Tooltip title={!isExpanded ? currentUser?.name : ""} placement="right">
           <Box
             sx={{
               display: "flex",
@@ -166,16 +167,16 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             <ListItemIcon sx={{ minWidth: isExpanded ? "36px" : "24px" }}>
               <PersonIcon />
             </ListItemIcon>
-            {isExpanded && <ListItemText primary={user.name} />}
+            {isExpanded && <ListItemText primary={currentUser?.name || "User"} />}
           </Box>
         </Tooltip>
 
         <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
           <MenuItem onClick={handleLogout}>
             <ListItemIcon sx={{ minWidth: "36px" }}>
-              <LogoutIcon fontSize='small' />
+              <LogoutIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary='Logout' />
+            <ListItemText primary="Logout" />
           </MenuItem>
         </Menu>
       </Box>

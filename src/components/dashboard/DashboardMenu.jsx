@@ -9,6 +9,9 @@ import {
   IconButton,
   Switch,
   FormControlLabel,
+  useTheme,
+  useMediaQuery,
+  Tooltip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -16,13 +19,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TuneIcon from "@mui/icons-material/Tune";
-import { getMenuItems } from "../../services/api"; // Adjust the import path as needed
+import { getMenuItems,} from "../../services/api"; // Adjust the import path as needed
 import { Navigate } from "react-router-dom";
-import { LeafyGreen } from "lucide-react";
+import { CircleDashed, LeafyGreen, Vegan, WheatOff } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000";
 
 const DashboardMenu = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -51,33 +56,8 @@ const DashboardMenu = () => {
   const handleNavigate = () => {
     Navigate("/add-items");
   };
-
-  // const handleInputChange = (id, field, value) => {
-  //   setMenuItems((prevItems) =>
-  //     prevItems.map((item) =>
-  //       item.id === id ? { ...item, [field]: value } : item
-  //     )
-  //   );
-  // };
-
-  // const handleAddItem = () => {
-  //   const newItem = {
-  //     id: menuItems.length + 1,
-  //     name: "New Item",
-  //     description: "Description of the new item",
-  //     price: "$0",
-  //     isVeg: false,
-  //     isVegan: false,
-  //     image: "https://via.placeholder.com/150",
-  //     isEditing: true,
-  //   };
-  //   setMenuItems((prevItems) => [...prevItems, newItem]);
-  // };
-
-  // const handleDeleteItem = (id) => {
-  //   setMenuItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  // };
-
+  // Uncomment the following line for debugging in development mode only
+  // if (process.env.NODE_ENV === 'development') console.log(menu);
   return (
     <Box
       sx={{
@@ -85,12 +65,14 @@ const DashboardMenu = () => {
       }}
     >
       {/* Section Title */}
-      <Typography variant="h4" fontWeight="bold" mb={2}>
+      <Typography variant="h4" fontWeight="bold" mb={2} fontSize={isMobile ? "1.5rem" : "2rem"}>
+      
         Menu Items
       </Typography>
 
-      {/* Menu Items Section */}
-      <Paper elevation={3} sx={{ p: 2 }}>
+  
+        {/* Menu Items Section */}
+        <Paper elevation={3} sx={{ p: 2 }}>
         <Box
           sx={{
             display: "flex",
@@ -119,18 +101,19 @@ const DashboardMenu = () => {
         </Box>
 
         {/* Menu Items Grid */}
-        <Grid container spacing={2}>
-          {menu.map((item) => (
+        <Grid className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {loading ? (
+            <Box>
+              <CircleDashed size={40} className="animate animate-spin text-orange-500" />
+            </Box>
+          ) : error ? (
+          <Box>{error}</Box>
+          ) : (
+          <>
+            {menu.slice(0,8).map((item) => (
             <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
+              
               key={item.id}
-              // sx={{
-              //   size: { xs: 12, sm: 6, md: 4 },
-              // }}
             >
               <Paper
                 elevation={2}
@@ -156,6 +139,11 @@ const DashboardMenu = () => {
                   />
                 </Box>
 
+                <Tooltip sx={{
+                  color: "textSecondary",
+                }}
+                  title={item.description} arrow
+                >
                 <Typography
                   variant="subtitle1"
                   sx={{
@@ -166,10 +154,29 @@ const DashboardMenu = () => {
                 >
                   {item.name}
                 </Typography>
+                </Tooltip>
 
-                <Typography sx={{ color: "textSecondary" }}>
-                  {item.description}
-                </Typography>
+                
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                    <Typography variant="body2" noWrap 
+                    sx={{
+                       textAlign: "center",
+                       bgcolor: "#F5740099",
+                       width: "fit-content",
+                       padding: "2px 4px",
+                       color: "#fff",
+                       borderRadius: "5px",
+                      }}
+                    >
+                      {item?.categoryName}
+                    </Typography>
+                    </Box>
 
                 <Box
                   display="flex"
@@ -198,15 +205,16 @@ const DashboardMenu = () => {
                     {item.dietaryInfo?.isVegan && (
                       <Typography
                         variant="caption"
-                        color="orange"
+                        color="#009966"
                         sx={{ 
                           mr: 1,
                           display: "flex",
                           alignItems: "center",
                           fontSize: "0.8rem",
-                          
+                          gap: 0.5,
                          }}
                       >
+                        <Vegan size={15}/>
                         Vegan
                       </Typography>
                     )}
@@ -219,10 +227,10 @@ const DashboardMenu = () => {
                           display: "flex",
                           alignItems: "center",
                           fontSize: "0.8rem",
-
+                          gap: 0.5,
                          }}
                       >
-                        <WheatOff/>
+                        <WheatOff size={15}/>
                         Gluten Free
                       </Typography>
                     )}
@@ -235,6 +243,8 @@ const DashboardMenu = () => {
               </Paper>
             </Grid>
           ))}
+          </>
+          )}
         </Grid>
       </Paper>
     </Box>
