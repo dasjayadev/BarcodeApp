@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Table = require('../models/Table');
-const QRCode = require('../models/QRCode');
+const Table = require('../models/Table.model');
+const QRCode = require('../models/QRCode.model');
 const { auth, authorize } = require('../middleware/auth');
 const qrcode = require('qrcode');
 const path = require('path');

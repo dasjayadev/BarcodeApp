@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const MenuItem = require('../models/MenuItem');
-const Table = require('../models/Table');
-const Category = require('../models/Category');
-const Order = require('../models/Order'); // Assuming you have an Order model
+const MenuItem = require('../models/MenuItem.model');
+const Table = require('../models/Table.model');
+const Category = require('../models/Category.model');
+const Order = require('../models/Order.model'); // Assuming you have an Order model
 
 // Get all menu items (public access)
 router.get('/menu', async (req, res) => {

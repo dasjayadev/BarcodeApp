@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const QRCode = require('../models/QRCode');
+const QRCode = require('../models/QRCode.model');
 const qrcode = require('qrcode');
 const { auth, authorize } = require('../middleware/auth');
 const path = require('path');

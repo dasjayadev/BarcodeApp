@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Offer = require('../models/Offer');
+const Offer = require('../models/Offer.model');
 const { auth, authorize } = require('../middleware/auth');
 
 // Get all offers

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Order = require('../models/Order');
-const Table = require('../models/Table');
+const Order = require('../models/Order.model');
+const Table = require('../models/Table.model');
 const { auth, authorize } = require('../middleware/auth');
 
 // Get all orders (protected)

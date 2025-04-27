@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const MenuItem = require('../models/MenuItem');
-const Category = require('../models/Category');
+const MenuItem = require('../models/MenuItem.model');
+const Category = require('../models/Category.model');
 const { auth, authorize } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
