@@ -102,7 +102,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             placement="right"
           >
             <ListItem
-              button
+              button="true"
               onClick={() => handleNavigation(item.path)}
               sx={{
                 px: 2,
@@ -115,7 +115,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
                 },
               }}
             >
-              <ListItemIcon sx={{ minWidth: isExpanded ? "36px" : "24px" }}>
+              <ListItemIcon sx={{ minWidth: isExpanded ? "36px" : "24px", color: "#F57400" }}>
                 {item.icon}
               </ListItemIcon>
               {isExpanded && <ListItemText primary={item.text} />}
@@ -129,7 +129,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
         <Divider sx={{ mb: 1 }} />
         <Tooltip title={!isExpanded ? "Settings" : ""} placement="right">
           <ListItem
-            button
+            button="true"
             onClick={() => handleNavigation("/settings")}
             sx={{
               px: 2,
