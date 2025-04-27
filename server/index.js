@@ -5,14 +5,14 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const menuRoutes = require('./routes/menu');
-const offerRoutes = require('./routes/offers');
-const userRoutes = require('./routes/users');
-const qrCodeRoutes = require('./routes/qrcodes');
-const tableRoutes = require('./routes/tables');
-const orderRoutes = require('./routes/orders');
-const publicRoutes = require('./routes/public'); // Import public routes
+const authRoutes = require('./routes/auth.routes');
+const menuRoutes = require('./routes/menu.routes');
+const offerRoutes = require('./routes/offers.routes');
+const userRoutes = require('./routes/users.routes');
+const qrCodeRoutes = require('./routes/qrcodes.routes');
+const tableRoutes = require('./routes/tables.routes');
+const orderRoutes = require('./routes/orders.routes');
+const publicRoutes = require('./routes/public.routes'); // Import public routes
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +20,16 @@ dotenv.config();
 // Create Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// !todo: implement this for security later
+// const whitelist = [process.env.CLIENT_URL, process.env.ADMIN_URL];
+// Recommended CORS configuration
+// const corsOptions = {
+//   origin: process.env.CLIENT_URL,
+//   credentials: true
+// };
+
+// app.use(cors(corsOptions));
 
 // Middleware
 app.use(cors());
