@@ -308,10 +308,7 @@ const DashboardTable = () => {
               <>
                 {tables.slice(0, 4).map((table) => (
                   <Grid
-                    item
-                    xs={12}
-                    sm={6}
-                    lg={3}
+                    size={{xs:12, sm:6, lg:3}}
                     key={table._id}
                     sx={{ display: "flex" }}
                   >
