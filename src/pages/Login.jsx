@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  const { login } = useAuth();
   const [credentials, setCredentials] = useState({
     email: '',
     password: ''
@@ -39,17 +41,17 @@ const Login = () => {
 
     try {
       const response = await loginUser(credentials);
-      // Store auth data in local storage
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Call the login function from AuthContext instead of manually setting localStorage
+      // This will update both localStorage AND React state
+      login(response.data.token, response.data.user);
       
       // Redirect based on user role
       if (response.data.user.role === 'owner' || response.data.user.role === 'manager') {
         navigate('/dashboard');
-      }else if(response.data.user.role === 'staff'){
+      } else if(response.data.user.role === 'staff'){
         navigate('/dashboard/orders');
-      }
-       else {
+      } else {
         navigate('/');
       }
     } catch (err) {
