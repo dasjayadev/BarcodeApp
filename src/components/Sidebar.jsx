@@ -100,6 +100,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             key={item.text}
             title={!isExpanded ? item.text : ""}
             placement="right"
+            arrow
           >
             <ListItem
               button="true"
@@ -127,10 +128,10 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
       {/* Bottom Section */}
       <Box sx={{ mt: "auto", p: 2 }}>
         <Divider sx={{ mb: 1 }} />
-        <Tooltip title={!isExpanded ? "Settings" : ""} placement="right">
+        <Tooltip title={!isExpanded ? "Settings" : ""} placement="right" arrow>
           <ListItem
             button="true"
-            onClick={() => handleNavigation("/settings")}
+            onClick={() => handleNavigation("/dashboard/settings")}
             sx={{
               px: 2,
               py: 1.5,
@@ -143,13 +144,13 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             }}
           >
             <ListItemIcon sx={{ minWidth: isExpanded ? "36px" : "24px" }}>
-              <SettingsIcon />
+              <SettingsIcon sx={{color: "#F57400"}} />
             </ListItemIcon>
             {isExpanded && <ListItemText primary="Settings" />}
           </ListItem>
         </Tooltip>
 
-        <Tooltip title={!isExpanded ? currentUser?.name : ""} placement="right">
+        <Tooltip title={!isExpanded ? currentUser?.name : ""} placement="right" arrow>
           <Box
             sx={{
               display: "flex",
@@ -164,7 +165,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
             }}
             onClick={handleUserClick}
           >
-            <ListItemIcon sx={{ minWidth: isExpanded ? "36px" : "24px" }}>
+            <ListItemIcon sx={{ minWidth: isExpanded ? "36px" : "24px", color: "#F57400" }}>
               <PersonIcon />
             </ListItemIcon>
             {isExpanded && <ListItemText primary={currentUser?.name || "User"} />}
@@ -173,7 +174,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
 
         <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
           <MenuItem onClick={handleLogout}>
-            <ListItemIcon sx={{ minWidth: "36px" }}>
+            <ListItemIcon sx={{ minWidth: "36px",color: "#F57400" }}>
               <LogoutIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary="Logout" />
