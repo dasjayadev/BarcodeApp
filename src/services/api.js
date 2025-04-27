@@ -140,7 +140,13 @@ export const deleteOffer = (id) => api.delete(`/offers/${id}`);
 export const getUsers = () => api.get('/users');
 export const getUser = (id) => api.get(`/users/${id}`);
 export const createUser = (user) => api.post('/users', user);
-export const updateUser = (id, user) => api.put(`/users/${id}`, user);
+export const updateUser = (id, userData) => {
+  if (!id) {
+    throw new Error('User ID is required for update');
+  }
+  return api.put(`/users/${id}`, userData);
+};
+
 export const deleteUser = (id) => api.delete(`/users/${id}`);
 
 // QR Code services

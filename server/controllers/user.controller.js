@@ -64,26 +64,33 @@ exports.createUser = async (req, res) => {
 
 // Update user
 exports.updateUser = async (req, res) => {
-  const { name, email, role } = req.body;
-  
-  const userFields = {};
-  if (name) userFields.name = name;
-  if (email) userFields.email = email;
-  if (role) userFields.role = role;
-
   try {
-    let user = await User.findById(req.params.id);
-
+    const { id } = req.params;
+    
+    if (!id || id === 'undefined') {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+    
+    const { name, email, role, password } = req.body;
+    
+    const userFields = {};
+    if (name) userFields.name = name;
+    if (email) userFields.email = email;
+    if (role) userFields.role = role;
+    if (password && password.trim() !== '') userFields.password = password;
+    
+    let user = await User.findById(id);
+    
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
+    
     user = await User.findByIdAndUpdate(
-      req.params.id,
+      id,
       { $set: userFields },
       { new: true }
     ).select('-password');
-
+    
     res.json(user);
   } catch (error) {
     console.error(error.message);

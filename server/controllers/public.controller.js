@@ -68,24 +68,41 @@ exports.getTableMenu = async (req, res) => {
 // Public endpoint to create an order
 exports.createOrder = async (req, res) => {
   try {
-    const { table, items, totalPrice } = req.body;
+    const { tableId, items, customerName, customerEmail, notes } = req.body;
 
     // Validate table
-    const tableRecord = await Table.findById(table);
-    if (!tableRecord) {
+    const table = await Table.findById(tableId);
+    if (!table) {
       return res.status(400).json({ message: 'Invalid table' });
     }
 
+    // Calculate total amount
+    let totalAmount = 0;
+    items.forEach(item => {
+      totalAmount += (item.price * (item.quantity || 1));
+    });
+
     const newOrder = new Order({
-      table,
+      table: tableId,  // Set as table field to match schema
+      customer: {
+        name: customerName || 'Guest',
+        email: customerEmail
+      },
       items,
-      totalPrice,
-      status: 'pending', // Default status
-      paymentStatus: 'unpaid' // Default payment status
+      totalAmount,     // Changed from totalPrice to totalAmount
+      notes,
+      status: 'pending',
+      paymentStatus: 'unpaid'
     });
 
     const order = await newOrder.save();
-    res.status(201).json(order);
+    
+    // Populate references for response
+    const populatedOrder = await Order.findById(order._id)
+      .populate('table')
+      .populate('items.menuItem');
+      
+    res.status(201).json(populatedOrder);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: 'Server Error' });

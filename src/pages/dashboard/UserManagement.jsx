@@ -7,6 +7,7 @@ import {
 } from "../../services/api";
 import DashboardNav from "../../components/DashboardNav";
 import { Eye, EyeClosed } from "lucide-react";
+import {toast} from "react-hot-toast";
 
 const UserManagement = () => {
   const [user, setUser] = useState({
@@ -61,9 +62,11 @@ const UserManagement = () => {
 
         await updateUser(currentUserId, userData);
         setSuccess("User updated successfully");
+        toast.success("User updated successfully");
       } else {
         await createUser(user);
-        setSuccess("User created successfully");
+        // setSuccess("User created successfully");
+        toast.success("User created successfully");
       }
 
       // Reset form and refresh users list
@@ -71,12 +74,13 @@ const UserManagement = () => {
       fetchUsers();
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");
+      toast.error(err.response?.data?.message || "An error occurred");
     }
   };
 
   const handleEdit = (user) => {
     setIsEditing(true);
-    setCurrentUserId(user.id);
+    setCurrentUserId(user._id || user.id); // Handle both ID formats
     setUser({
       name: user.name,
       email: user.email,

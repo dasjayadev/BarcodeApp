@@ -8,10 +8,10 @@ exports.getAllOrders = async (req, res) => {
     const query = {};
     
     if (status) query.status = status;
-    if (table) query.table = table;
+    if (table) query.table = table;  // Using 'table' instead of 'tableId'
     
     const orders = await Order.find(query)
-      .populate('tableId')
+      .populate('table')  // Changed from 'tableId' to 'table'
       .populate('items.menuItem')
       .populate('servedBy')
       .sort({ createdAt: -1 });
@@ -53,7 +53,7 @@ exports.createOrder = async (req, res) => {
     }
     
     // Check if table exists
-    const table = await Table.findById(tableId); // Ensure tableId is used consistently
+    const table = await Table.findById(tableId);
     if (!table) {
       return res.status(404).json({ message: 'Table not found' });
     }
@@ -65,7 +65,7 @@ exports.createOrder = async (req, res) => {
     });
     
     const newOrder = new Order({
-      tableId: tableId,
+      table: tableId,  // Changed from 'tableId' to 'table'
       customer: {
         name: customerName || 'Guest',
         email: customerEmail
