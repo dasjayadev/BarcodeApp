@@ -1,8 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const connectDB = require('./config/connectDB');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -38,9 +39,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// mongoose.connect(process.env.MONGODB_URI)
+//   .then(() => console.log('MongoDB connected'))
+//   .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -59,5 +60,8 @@ app.get('/', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
+  connectDB();
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;
