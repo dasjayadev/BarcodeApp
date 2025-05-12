@@ -54,6 +54,7 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(response.data);
         setIsAuthenticated(true);
       } catch (error) {
+        console.log(error)
         // Token is invalid or expired
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
