@@ -9,10 +9,13 @@ export const API_CONFIG = {
   // In development environments:
   // - First try using VITE_API_URL environment variable
   // - Then fall back to localhost:5000
-  BASE_URL: import.meta.env.PROD 
-    ? (import.meta.env.VITE_API_URL || 'https://barcode-app-backend.vercel.app' || '')
-    : (import.meta.env.VITE_API_URL || 'http://localhost:5000'),
+  // !uncomment the line below to use the Vercel URL
+  // BASE_URL: import.meta.env.PROD 
+  //   ? (import.meta.env.VITE_API_URL || 'https://barcode-app-backend.vercel.app' || '')
+  //   : (import.meta.env.VITE_API_URL || 'http://localhost:5000'),
     
+  // in Local client Development:
+  BASE_URL: 'https://barcode-app-backend.vercel.app',
   // Add API path prefix
   API_PATH: '/api',
   
