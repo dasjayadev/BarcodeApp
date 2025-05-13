@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import DashboardNav from '../../components/DashboardNav';
 import { getTables, createTable, updateTable, deleteTable, generateTableQR } from '../../services/api';
+import { API_CONFIG } from '../../config/api';
+
+// Replace the hardcoded URL with the config
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 const ManageTables = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,10 +28,6 @@ const ManageTables = () => {
     section: '',
     isActive: true
   });
-
-  // Replace process.env reference with direct URL
-  // This should match the base URL of your API (without the /api part)
-  const API_BASE_URL = 'http://localhost:5000';
 
   const fetchTables = async () => {
     try {

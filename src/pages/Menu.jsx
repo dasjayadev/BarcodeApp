@@ -274,7 +274,8 @@ const Menu = () => {
                     <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden">
                       {item.image && (
                         <img 
-                          src={item.image.startsWith('/') ? `http://localhost:5000${item.image}` : item.image} 
+                          // No need to modify URLs - they're now full URLs from Vercel Blob
+                          src={item.image} 
                           alt={item.name}
                           className="w-full h-40 object-cover"
                         />

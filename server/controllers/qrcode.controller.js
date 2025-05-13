@@ -3,6 +3,7 @@ const qrcode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
 const { uploadFile, deleteFile } = require('../utils/storage');
+const { put } = require('@vercel/blob');
 
 // Get all QR codes
 exports.getAllQRCodes = async (req, res) => {
@@ -65,29 +66,38 @@ exports.createGlobalQRCode = async (req, res) => {
 };
 
 // Create global menu QR code
-exports.createGlobalMenuQR = async (req, res) => {
+exports.createGlobalMenuQRCode = async (req, res) => {
   try {
-    const { url } = req.body;
+    const { baseUrl } = req.body;
+    
+    // Generate URL for global menu
+    const url = `${baseUrl}/menu`;
     
     // Generate QR code as buffer
-    const qrBuffer = await qrcode.toBuffer(url);
-    
-    // Upload to Vercel Blob Storage
-    const fileName = `qr-global-${Date.now()}.png`;
-    const fileUrl = await uploadFile(qrBuffer, fileName);
-    
-    // Create new QR code document with full URL
-    const newQRCode = new QRCode({
-      section: 'Global Menu',
-      url: url,
-      code: fileUrl, // Store the complete URL
-      type: 'global'
+    const qrBuffer = await new Promise((resolve, reject) => {
+      qrcode.toBuffer(url, (err, buffer) => {
+        if (err) reject(err);
+        else resolve(buffer);
+      });
     });
     
+    // Upload to Vercel Blob
+    const blob = await put(`qr-global-${Date.now()}.png`, qrBuffer, { 
+      access: 'public',
+      contentType: 'image/png'
+    });
+
+    const newQRCode = new QRCode({
+      section: 'Global Menu',
+      url,
+      code: blob.url, // Store the full Blob URL
+      type: 'global'
+    });
+
     const savedQRCode = await newQRCode.save();
     res.status(201).json(savedQRCode);
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 };

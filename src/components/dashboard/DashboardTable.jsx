@@ -190,7 +190,7 @@ const DashboardTable = () => {
               <Alert severity='error'>{error}</Alert>
             ) : restaurantQR ? (
               <img
-                src={`${API_BASE_URL}${restaurantQR.code}`}
+                src={restaurantQR.code}
                 alt='Restaurant QR Code'
                 style={{ maxWidth: "100%", maxHeight: "100%" }}
               />
