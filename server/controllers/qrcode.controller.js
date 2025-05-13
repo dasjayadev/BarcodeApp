@@ -2,6 +2,7 @@ const QRCode = require('../models/QRCode.model');
 const qrcode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
+const { uploadFile, deleteFile } = require('../utils/storage');
 
 // Get all QR codes
 exports.getAllQRCodes = async (req, res) => {
@@ -64,30 +65,29 @@ exports.createGlobalQRCode = async (req, res) => {
 };
 
 // Create global menu QR code
-exports.createGlobalMenuQRCode = async (req, res) => {
+exports.createGlobalMenuQR = async (req, res) => {
   try {
-    const { baseUrl } = req.body; // Frontend base URL
+    const { url } = req.body;
     
-    // Generate URL for global menu
-    const url = `${baseUrl}/menu`;
+    // Generate QR code as buffer
+    const qrBuffer = await qrcode.toBuffer(url);
     
-    // Generate QR code
-    const qrCodePath = path.join(__dirname, '..', 'uploads', `qr-global-${Date.now()}.png`);
-    await qrcode.toFile(qrCodePath, url);
+    // Upload to Vercel Blob Storage
+    const fileName = `qr-global-${Date.now()}.png`;
+    const fileUrl = await uploadFile(qrBuffer, fileName);
     
-    const code = `/uploads/${path.basename(qrCodePath)}`;
-
+    // Create new QR code document with full URL
     const newQRCode = new QRCode({
       section: 'Global Menu',
-      url,
-      code,
+      url: url,
+      code: fileUrl, // Store the complete URL
       type: 'global'
     });
-
+    
     const savedQRCode = await newQRCode.save();
     res.status(201).json(savedQRCode);
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 };
@@ -96,21 +96,20 @@ exports.createGlobalMenuQRCode = async (req, res) => {
 exports.deleteQRCode = async (req, res) => {
   try {
     const qrCode = await QRCode.findById(req.params.id);
-
+    
     if (!qrCode) {
       return res.status(404).json({ message: 'QR code not found' });
     }
-
-    // Delete QR code image file
-    const filePath = path.join(__dirname, '..', qrCode.code);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    
+    // Delete from Vercel Blob Storage if it's a full URL
+    if (qrCode.code && (qrCode.code.startsWith('http://') || qrCode.code.startsWith('https://'))) {
+      await deleteFile(qrCode.code);
     }
-
+    
     await qrCode.deleteOne();
     res.json({ message: 'QR code removed' });
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 };

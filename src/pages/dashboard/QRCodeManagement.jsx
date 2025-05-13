@@ -33,6 +33,7 @@ const QRCodeManagement = () => {
       setLoading(false);
     } catch (err) {
       setError('Failed to fetch QR code');
+      console.error('Error fetching QR code:', err);
       setLoading(false);
     }
   };
@@ -73,7 +74,6 @@ const QRCodeManagement = () => {
     if (!qrCode) return;
     
     const printWindow = window.open('', '_blank');
-    const API_BASE_URL = "http://localhost:5000"; // Adjust based on your setup
     
     printWindow.document.write(`
       <html>
@@ -88,7 +88,7 @@ const QRCodeManagement = () => {
         <body>
           <div class="container">
             <h2>${qrCode.section}</h2>
-            <img src="${API_BASE_URL}${qrCode.code}" />
+            <img src="${getQRImageUrl(qrCode)}" />
             <p>Scan to access our restaurant menu</p>
           </div>
         </body>
@@ -97,10 +97,19 @@ const QRCodeManagement = () => {
     
     printWindow.document.close();
     printWindow.focus();
+    
+    // Use setTimeout to ensure content is fully loaded before printing
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
     }, 250);
+  };
+
+  // Helper function to get the correct URL
+  const getQRImageUrl = (qrCode) => {
+    return qrCode.code.startsWith('/') 
+      ? `https://barcode-app-backend.vercel.app${qrCode.code}` 
+      : qrCode.code;
   };
 
   return (
@@ -137,7 +146,7 @@ const QRCodeManagement = () => {
           <div className="text-center">
             <div className="bg-gray-50 p-6 rounded-lg mb-4">
               <img 
-                src={restaurantQR.code.startsWith('/') ? `http://localhost:5000${restaurantQR.code}` : restaurantQR.code}
+                src={getQRImageUrl(restaurantQR)}
                 alt="Restaurant Menu QR Code" 
                 className="mx-auto w-64 h-64"
               />
@@ -147,7 +156,7 @@ const QRCodeManagement = () => {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <a 
-                href={restaurantQR.code.startsWith('/') ? `http://localhost:5000${restaurantQR.code}` : restaurantQR.code}
+                href={getQRImageUrl(restaurantQR)}
                 download="restaurant-menu-qr.png"
                 target="_blank"
                 rel="noreferrer"
