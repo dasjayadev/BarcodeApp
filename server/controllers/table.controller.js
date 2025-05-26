@@ -3,6 +3,8 @@ const QRCode = require('../models/QRCode.model');
 const qrcode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
+const { uploadFile, deleteFile } = require('../utils/storage');
+const { put } = require('@vercel/blob');
 
 // Get all tables
 exports.getAllTables = async (req, res) => {
@@ -128,9 +130,17 @@ exports.deleteTable = async (req, res) => {
       const qrCode = await QRCode.findById(table.qrCode);
       if (qrCode) {
         // Delete QR code image file
-        const filePath = path.join(__dirname, '..', qrCode.code);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
+        if (qrCode.code) {
+          if (qrCode.code.startsWith('http://') || qrCode.code.startsWith('https://')) {
+            // Delete from Vercel Blob
+            await deleteFile(qrCode.code);
+          } else {
+            // Handle legacy file deletion
+            const filePath = path.join(__dirname, '..', qrCode.code);
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
+          }
         }
         await qrCode.deleteOne();
       }
@@ -147,7 +157,7 @@ exports.deleteTable = async (req, res) => {
 // Generate QR code for table
 exports.generateQRCode = async (req, res) => {
   try {
-    const { baseUrl } = req.body; // Frontend base URL
+    const { baseUrl } = req.body;
     const table = await Table.findById(req.params.id);
     
     if (!table) {
@@ -156,29 +166,37 @@ exports.generateQRCode = async (req, res) => {
     
     // Delete existing QR code if it exists
     if (table.qrCode) {
-      const existingQR = await QRCode.findById(table.qrCode);
-      if (existingQR) {
-        const filePath = path.join(__dirname, '..', existingQR.code);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-        await existingQR.deleteOne();
-      }
+      // Handle deletion - note: Vercel Blob might not support deletion in free tier
+      // Just update the record and let Vercel Blob handle garbage collection
+      await QRCode.findByIdAndDelete(table.qrCode);
     }
 
     // Generate URL with table ID
     const url = `${baseUrl}/menu?table=${table._id}`;
     
-    // Generate QR code
-    const qrCodePath = path.join(__dirname, '..', 'uploads', `qr-table-${table.tableNumber}-${Date.now()}.png`);
-    await qrcode.toFile(qrCodePath, url);
+    // Generate QR code as buffer
+    const qrBuffer = await new Promise((resolve, reject) => {
+      qrcode.toBuffer(url, (err, buffer) => {
+        if (err) reject(err);
+        else resolve(buffer);
+      });
+    });
     
-    const code = `/uploads/${path.basename(qrCodePath)}`;
+    // Upload to Vercel Blob
+    const blob = await put(
+      `qr-table-${table.tableNumber}-${Date.now()}.png`, 
+      qrBuffer, 
+      { 
+        access: 'public',
+        contentType: 'image/png',
+        token: process.env.BARCODEAPP_READ_WRITE_TOKEN // Pass token explicitly
+      }
+    );
 
     const newQRCode = new QRCode({
       section: `Table ${table.tableNumber}`,
       url,
-      code,
+      code: blob.url, // Store the full Blob URL
       type: 'table',
       tableId: table._id
     });

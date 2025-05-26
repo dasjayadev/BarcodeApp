@@ -17,11 +17,13 @@ import PrintIcon from "@mui/icons-material/Print";
 import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import AddIcon from "@mui/icons-material/Add";
 
+import { API_CONFIG } from "../../config/api";
+
 import { getQRCodes, getTables, generateTableQR } from "../../services/api";
 import { CircleDashed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = "http://localhost:5000"; // Adjust based on your setup
+const API_BASE_URL = API_CONFIG.BASE_URL; // Adjust based on your setup
 
 const DashboardTable = () => {
   const [tables, setTables] = useState([]);
@@ -89,7 +91,7 @@ const DashboardTable = () => {
         <body>
           <div class="container">
             <h2>${restaurantQR.section}</h2>
-            <img src="${API_BASE_URL}${restaurantQR.code}" />
+            <img src="${restaurantQR.code}" />
             <p>Scan to access the menu</p>
           </div>
         </body>
@@ -134,7 +136,7 @@ const DashboardTable = () => {
         <body>
           <div class="container">
             <h2>Table ${table.tableNumber}</h2>
-            <img src="${API_BASE_URL}${table.qrCode.code}" />
+            <img src="${table.qrCode.code}" />
             <p>Scan to access the menu</p>
           </div>
         </body>
@@ -190,7 +192,7 @@ const DashboardTable = () => {
               <Alert severity='error'>{error}</Alert>
             ) : restaurantQR ? (
               <img
-                src={`${API_BASE_URL}${restaurantQR.code}`}
+                src={restaurantQR.code}
                 alt='Restaurant QR Code'
                 style={{ maxWidth: "100%", maxHeight: "100%" }}
               />
@@ -229,7 +231,7 @@ const DashboardTable = () => {
               startIcon={<DownloadIcon />}
               disabled={!restaurantQR}
               component='a'
-              href={restaurantQR ? `${API_BASE_URL}${restaurantQR.code}` : "#"}
+              href={restaurantQR ? `${restaurantQR.code}` : "#"}
               download={restaurantQR ? `restaurant-qr-code.png` : ""}
               target='_blank'
               rel='noopener noreferrer'
@@ -342,7 +344,7 @@ const DashboardTable = () => {
                         >
                           {table.qrCode ? (
                             <img
-                              src={`${API_BASE_URL}${table.qrCode.code}`}
+                              src={`${table.qrCode.code}`}
                               alt={`QR Code for Table ${table.tableNumber}`}
                               style={{
                                 maxWidth: "100%",
@@ -396,7 +398,7 @@ const DashboardTable = () => {
                             <Button
                               variant='contained'
                               component='a'
-                              href={`${API_BASE_URL}${table.qrCode.code}`}
+                              href={`${table.qrCode.code}`}
                               download={`table-${table.tableNumber}-qr-code.png`}
                               target='_blank'
                               rel='noopener noreferrer'

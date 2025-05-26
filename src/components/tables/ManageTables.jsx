@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import DashboardNav from '../../components/DashboardNav';
 import { getTables, createTable, updateTable, deleteTable, generateTableQR } from '../../services/api';
+import { API_CONFIG } from '../../config/api';
+
+// Replace the hardcoded URL with the config
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 const ManageTables = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,10 +28,6 @@ const ManageTables = () => {
     section: '',
     isActive: true
   });
-
-  // Replace process.env reference with direct URL
-  // This should match the base URL of your API (without the /api part)
-  const API_BASE_URL = 'http://localhost:5000';
 
   const fetchTables = async () => {
     try {
@@ -395,7 +395,9 @@ const ManageTables = () => {
             <div className="flex flex-col items-center justify-center mb-4">
               {/* Use the complete URL path for the QR code image */}
               <img 
-                src={`${API_BASE_URL}${currentQRCode.code}`}
+                src={currentQRCode.code.startsWith('/') 
+                  ? `${API_BASE_URL}${currentQRCode.code}` 
+                  : currentQRCode.code}
                 alt={`QR Code for Table ${currentQRTable?.tableNumber}`}
                 className="w-64 h-64 mb-4"
               />
@@ -405,7 +407,9 @@ const ManageTables = () => {
 
             <div className="flex justify-between mt-4">
               <a
-                href={`${API_BASE_URL}${currentQRCode.code}`}
+                href={currentQRCode.code.startsWith('/') 
+                  ? `${API_BASE_URL}${currentQRCode.code}` 
+                  : currentQRCode.code}
                 download={`table-${currentQRTable?.tableNumber}-qr-code.png`}
                 className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
                 target="_blank"
