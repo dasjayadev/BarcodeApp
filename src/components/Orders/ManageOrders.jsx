@@ -1,18 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import DashboardNav from "../../components/DashboardNav";
-import toast from "react-hot-toast";
 import {
   getOrders,
   updateOrderStatus,
   updateOrderPayment,
 } from "../../services/api";
+import {ErrorToast, InfoToast, SuccessToast} from "../Common/Toast/Toast";
 
-const ManageOrder = () => {
+const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [statusFilter, setStatusFilter] = useState("pending");
   // Add state to track remaining time for orders
   const [timerValues, setTimerValues] = useState({});
@@ -86,7 +84,6 @@ const ManageOrder = () => {
         setInitialLoad(false);
       }
     } catch (err) {
-      setError("Failed to fetch orders");
       setLoading(false);
       console.error(err);
     }
@@ -102,30 +99,14 @@ const ManageOrder = () => {
       );
 
       await updateOrderStatus(orderId, status);
-      
-      toast.success(`Order status updated to ${status}`, {
-        style: {
-          border: "1px solid #ff6900",
-          padding: "16px",
-          color: "#ff6900",
-        },
-        iconTheme: {
-          primary: "#ff6900",
-          secondary: "#ffffff",
-        },
-      });
-      setSuccess(`Order status updated to ${status}`);
 
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccess("");
-      }, 3000);
+      SuccessToast(`Order status updated to ${status}`);
+
     } catch (err) {
       // Revert optimistic update on error
       setOrders(ordersRef.current);
       const errorMsg = err.response?.data?.message || "Failed to update order status";
-      toast.error(errorMsg);
-      setError(errorMsg);
+      ErrorToast(errorMsg);
       console.error(err);
     }
   };
@@ -140,20 +121,12 @@ const ManageOrder = () => {
       );
 
       await updateOrderPayment(orderId, paymentStatus);
-
-      toast.success(`Payment status updated to ${paymentStatus}`);
-      setSuccess(`Payment status updated to ${paymentStatus}`);
-
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccess("");
-      }, 3000);
+      SuccessToast(`Payment status updated to ${paymentStatus}`);
     } catch (err) {
       // Revert optimistic update on error
       setOrders(ordersRef.current);
       const errorMsg = err.response?.data?.message || "Failed to update payment status";
-      toast.error(errorMsg);
-      setError(errorMsg);
+      ErrorToast(errorMsg);
       console.error(err);
     }
   };
@@ -213,19 +186,6 @@ const ManageOrder = () => {
     <div className="container mx-auto p-4">
       <DashboardNav />
       <h1 className="text-3xl font-bold mb-4">Order Management</h1>
-
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-
-      {/* {success && (
-        // <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-        //   {success}
-        // </div>
-        toast.success(success,{position:"bottom-center"})
-      )} */}
 
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Filter Orders</h2>
@@ -505,4 +465,4 @@ const ManageOrder = () => {
   );
 };
 
-export default ManageOrder;
+export default ManageOrders;

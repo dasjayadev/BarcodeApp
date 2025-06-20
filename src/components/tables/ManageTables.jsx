@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import DashboardNav from '../../components/DashboardNav';
 import { getTables, createTable, updateTable, deleteTable, generateTableQR } from '../../services/api';
 import { API_CONFIG } from '../../config/api';
+import { ErrorToast, SuccessToast } from '../Common/Toast/Toast';
+import TransparentWrapper from '../Common/DIalog/TransparentWrapper';
 
 // Replace the hardcoded URL with the config
 const API_BASE_URL = API_CONFIG.BASE_URL;
@@ -9,7 +11,6 @@ const API_BASE_URL = API_CONFIG.BASE_URL;
 const ManageTables = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
   const [tables, setTables] = useState([]);
   
   // Form state
@@ -89,13 +90,12 @@ const ManageTables = () => {
       const baseUrl = window.location.origin;
       await generateTableQR(tableId, baseUrl);
       
-      setSuccess('QR code generated successfully!');
+      // setSuccess('QR code generated successfully!');
+      SuccessToast('QR code generated successfully!');
       fetchTables(); // Refresh tables to show QR code
       
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to generate QR code');
+      ErrorToast(err.response?.data?.message || 'Failed to generate QR code');
     } finally {
       setIsLoading(false);
     }
@@ -114,19 +114,17 @@ const ManageTables = () => {
       
       if (isEditing) {
         await updateTable(currentTableId, tableForm);
-        setSuccess('Table updated successfully!');
+        SuccessToast('Table updated successfully!');
       } else {
         await createTable(tableForm);
-        setSuccess('Table created successfully!');
+        SuccessToast('Table created successfully!');
       }
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(''), 3000);
       
       setShowModal(false);
       fetchTables();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save table');
+      // setError(err.response?.data?.message || 'Failed to save table');
+      ErrorToast(err.response?.data?.message || 'Failed to save table');
     } finally {
       setIsLoading(false);
     }
@@ -137,14 +135,11 @@ const ManageTables = () => {
       setIsLoading(true);
       await deleteTable(currentTableId);
       
-      setSuccess('Table deleted successfully!');
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(''), 3000);
-      
+      SuccessToast('Table deleted successfully!');
       setShowDeleteConfirm(false);
       fetchTables();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete table');
+      ErrorToast(err.response?.data?.message || 'Failed to delete table');
     } finally {
       setIsLoading(false);
     }
@@ -174,18 +169,6 @@ const ManageTables = () => {
             <button 
               className="text-red-700 font-bold" 
               onClick={() => setError(null)}
-            >
-              ×
-            </button>
-          </div>
-        )}
-        
-        {success && (
-          <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-            <p>{success}</p>
-            <button 
-              className="text-green-700 font-bold" 
-              onClick={() => setSuccess(null)}
             >
               ×
             </button>
@@ -270,7 +253,7 @@ const ManageTables = () => {
 
       {/* Add/Edit Table Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <TransparentWrapper>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h2 className="text-xl mb-4">{isEditing ? 'Edit Table' : 'Add New Table'}</h2>
             
@@ -358,12 +341,12 @@ const ManageTables = () => {
               </div>
             </form>
           </div>
-        </div>
+        </TransparentWrapper>
       )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <TransparentWrapper>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h2 className="text-xl mb-4">Confirm Deletion</h2>
             <p className="mb-4">Are you sure you want to delete this table? This action cannot be undone.</p>
@@ -383,12 +366,12 @@ const ManageTables = () => {
               </button>
             </div>
           </div>
-        </div>
+        </TransparentWrapper>
       )}
 
       {/* QR Code Preview Modal */}
       {showQRPreview && currentQRCode && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <TransparentWrapper>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h2 className="text-xl mb-4">QR Code for Table {currentQRTable?.tableNumber}</h2>
             
@@ -425,7 +408,7 @@ const ManageTables = () => {
               </button>
             </div>
           </div>
-        </div>
+        </TransparentWrapper>
       )}
     </div>
   );
