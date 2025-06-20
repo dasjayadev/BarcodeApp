@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import DashboardNav from "../../components/DashboardNav";
+import toast from "react-hot-toast";
 import {
   getOrders,
   updateOrderStatus,
@@ -101,7 +102,18 @@ const ManageOrder = () => {
       );
 
       await updateOrderStatus(orderId, status);
-
+      
+      toast.success(`Order status updated to ${status}`, {
+        style: {
+          border: "1px solid #ff6900",
+          padding: "16px",
+          color: "#ff6900",
+        },
+        iconTheme: {
+          primary: "#ff6900",
+          secondary: "#ffffff",
+        },
+      });
       setSuccess(`Order status updated to ${status}`);
 
       // Clear success message after 3 seconds
@@ -111,7 +123,9 @@ const ManageOrder = () => {
     } catch (err) {
       // Revert optimistic update on error
       setOrders(ordersRef.current);
-      setError(err.response?.data?.message || "Failed to update order status");
+      const errorMsg = err.response?.data?.message || "Failed to update order status";
+      toast.error(errorMsg);
+      setError(errorMsg);
       console.error(err);
     }
   };
@@ -127,6 +141,7 @@ const ManageOrder = () => {
 
       await updateOrderPayment(orderId, paymentStatus);
 
+      toast.success(`Payment status updated to ${paymentStatus}`);
       setSuccess(`Payment status updated to ${paymentStatus}`);
 
       // Clear success message after 3 seconds
@@ -136,9 +151,9 @@ const ManageOrder = () => {
     } catch (err) {
       // Revert optimistic update on error
       setOrders(ordersRef.current);
-      setError(
-        err.response?.data?.message || "Failed to update payment status"
-      );
+      const errorMsg = err.response?.data?.message || "Failed to update payment status";
+      toast.error(errorMsg);
+      setError(errorMsg);
       console.error(err);
     }
   };
@@ -205,11 +220,12 @@ const ManageOrder = () => {
         </div>
       )}
 
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          {success}
-        </div>
-      )}
+      {/* {success && (
+        // <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        //   {success}
+        // </div>
+        toast.success(success,{position:"bottom-center"})
+      )} */}
 
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Filter Orders</h2>

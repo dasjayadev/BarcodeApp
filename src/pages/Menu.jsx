@@ -29,6 +29,7 @@ const Menu = () => {
   
   const location = useLocation();
   const navigate = useNavigate();
+  console.log(navigate);
   
   // Get table ID from URL query parameters
   const tableId = new URLSearchParams(location.search).get('table');
@@ -78,6 +79,7 @@ const Menu = () => {
     try {
       const response = await getTable(id);
       setTable(response.data);
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setError('Invalid table QR code');
     }
