@@ -22,6 +22,7 @@ import {
   Logout as LogoutIcon,
   ChevronLeft as CollapseIcon,
   ChevronRight as ExpandIcon,
+  SpaceDashboard as DashboardIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -51,6 +52,7 @@ const Sidebar = ({ isExpanded, toggleSidebar }) => {
 
   // Navigation items with role-based access
   const navigationItems = [
+    { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard", roles: ["owner", "manager", "staff"] },
     { text: "Orders", icon: <OrdersIcon />, path: "/dashboard/orders", roles: ["owner", "manager", "staff"] },
     { text: "Table Management", icon: <TableIcon />, path: "/dashboard/tables", roles: ["owner", "manager"] },
     { text: "Menu Management", icon: <MenuIcon />, path: "/dashboard/menu", roles: ["owner", "manager"] },

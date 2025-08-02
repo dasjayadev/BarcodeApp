@@ -19,8 +19,10 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import TableBarIcon from "@mui/icons-material/TableBar";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { CircleDashed } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const DashboardOrders = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -169,6 +171,7 @@ const DashboardOrders = () => {
           variant="contained"
           size={isSmall ? "small" : "medium"}
           sx={{ backgroundColor:"#F57400", '&:hover': { backgroundColor: "#FF8753" } }}
+          onClick={() => navigate('/dashboard/orders')}
         >
           <AssignmentIcon /> &nbsp; Manage Orders
         </Button>

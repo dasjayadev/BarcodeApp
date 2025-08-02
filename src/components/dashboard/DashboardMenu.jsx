@@ -20,7 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TuneIcon from "@mui/icons-material/Tune";
 import { getMenuItems,} from "../../services/api"; // Adjust the import path as needed
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CircleDashed, LeafyGreen, Vegan, WheatOff } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000";
@@ -31,6 +31,7 @@ const DashboardMenu = () => {
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const fetchMenuItems = async () => {
     try {
@@ -54,7 +55,7 @@ const DashboardMenu = () => {
   }, []);
 
   const handleNavigate = () => {
-    Navigate("/add-items");
+    navigate("/dashboard/menu");
   };
   // Uncomment the following line for debugging in development mode only
   // if (process.env.NODE_ENV === 'development') console.log(menu);
