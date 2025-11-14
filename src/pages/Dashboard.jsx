@@ -4,6 +4,7 @@ import DashboardTable from '../components/dashboard/DashboardTable'
 import DashboardOrders from '../components/dashboard/DashboardOrders'
 import DashboardMenu from '../components/dashboard/DashboardMenu'
 import DashboardStaff from '../components/dashboard/DashboardStaff'
+import DashboardAnalytics from '../components/dashboard/DashboardAnalytics'
 import { Box, useTheme, useMediaQuery } from '@mui/material'
 
 const NewDashboard = () => {
@@ -21,8 +22,9 @@ const NewDashboard = () => {
           gap: isMobile ? 2 : 4
         }}
       >
-        <DashboardTable />
+        <DashboardAnalytics />
         <DashboardOrders />
+        <DashboardTable />
         <DashboardMenu />
         <DashboardStaff />
       </Box>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import ErrorMessage from '../components/Common/Error/ErrorMessage';
 
 const Login = () => {
   const { login } = useAuth();
@@ -68,11 +69,7 @@ const Login = () => {
           <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Login</h1>
           
           <form onSubmit={handleLogin}>
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {error}
-              </div>
-            )}
+            <ErrorMessage message={error} onDismiss={() => setError('')} />
             
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-2">Email</label>

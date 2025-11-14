@@ -15,7 +15,8 @@ export const API_CONFIG = {
   //   : (import.meta.env.VITE_API_URL || 'http://localhost:5000'),
     
   // in Local client Development:
-  BASE_URL: 'https://barcode-app-backend.vercel.app',
+  // BASE_URL: 'https://barcode-app-backend.vercel.app',
+  BASE_URL: 'http://localhost:5000',
   // Add API path prefix
   API_PATH: '/api',
   

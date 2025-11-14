@@ -4,6 +4,9 @@ import { useAuth } from "../../context/AuthContext";
 import { updateUser } from "../../services/api";
 import DashboardLayout from "../../components/Layout/DashboardLayout";
 import { Box, useTheme, useMediaQuery } from "@mui/material";
+import ErrorMessage from "../../components/Common/Error/ErrorMessage";
+import SuccessMessage from "../../components/Common/Success/SuccessMessage";
+import { SuccessToast, ErrorToast } from "../../components/Common/Toast/Toast";
 
 const Settings = () => {
   
@@ -77,9 +80,9 @@ const Settings = () => {
       if (profile.password) {
         updateData.password = profile.password;
       }
-      // console.log(currentUser.id, updateData);
       await updateUser(currentUser.id, updateData);
       setSuccess("Profile updated successfully");
+      SuccessToast("Profile updated successfully");
 
       // Clear password fields after successful update
       setProfile((prev) => ({
@@ -94,7 +97,9 @@ const Settings = () => {
       }, 3000);
     } catch (err) {
       console.error("Error updating profile:", err);
-      setError(err.response?.data?.message || "Failed to update profile");
+      const errorMsg = err.response?.data?.message || "Failed to update profile";
+      setError(errorMsg);
+      ErrorToast(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -115,17 +120,17 @@ const Settings = () => {
           {/* <DashboardNav /> */}
           <h1 className='text-3xl font-bold mb-4'>Settings</h1>
 
-          {error && (
-            <div className='max-w-md mx-auto bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>
-              <p>{error}</p>
-            </div>
-          )}
+          <ErrorMessage 
+            message={error} 
+            onDismiss={() => setError('')} 
+            className="max-w-md mx-auto"
+          />
 
-          {success && (
-            <div className='max-w-md mx-auto bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4'>
-              <p>{success}</p>
-            </div>
-          )}
+          <SuccessMessage 
+            message={success} 
+            onDismiss={() => setSuccess('')} 
+            className="max-w-md mx-auto"
+          />
 
           <form onSubmit={handleSubmit} className='max-w-md mx-auto'>
             <div className='mb-4'>

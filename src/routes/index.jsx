@@ -1,21 +1,41 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Route, Navigate } from 'react-router-dom';
-import Home from '../pages/Home';
-import Menu from '../pages/Menu';
-import Offers from '../pages/Offers';
-import About from '../pages/About';
-import Login from '../pages/Login';
-import ForgotPassword from '../pages/ForgotPassword';
-import ResetPassword from '../pages/ResetPassword';
-import Dashboard from '../pages/Dashboard';
-import MenuManagement from '../pages/dashboard/MenuManagement';
-import OffersManagement from '../pages/dashboard/OffersManagement';
-import UserManagement from '../pages/dashboard/UserManagement';
-import QRCodeManagement from '../pages/dashboard/QRCodeManagement';
-import TableManagement from '../pages/dashboard/TableManagement';
-import OrderManagement from '../pages/dashboard/OrderManagement';
-import Settings from '../pages/dashboard/Settings';
-import OldDashboard from '../pages/OldDashboard';
+
+// Lazy load components for better performance
+const Home = lazy(() => import('../pages/Home'));
+const Menu = lazy(() => import('../pages/Menu'));
+const Offers = lazy(() => import('../pages/Offers'));
+const About = lazy(() => import('../pages/About'));
+const Login = lazy(() => import('../pages/Login'));
+const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('../pages/ResetPassword'));
+const OrderTracking = lazy(() => import('../pages/OrderTracking'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
+const MenuManagement = lazy(() => import('../pages/dashboard/MenuManagement'));
+const OffersManagement = lazy(() => import('../pages/dashboard/OffersManagement'));
+const UserManagement = lazy(() => import('../pages/dashboard/UserManagement'));
+const QRCodeManagement = lazy(() => import('../pages/dashboard/QRCodeManagement'));
+const TableManagement = lazy(() => import('../pages/dashboard/TableManagement'));
+const OrderManagement = lazy(() => import('../pages/dashboard/OrderManagement'));
+const Settings = lazy(() => import('../pages/dashboard/Settings'));
+const OldDashboard = lazy(() => import('../pages/OldDashboard'));
+
+// Loading component
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
+
+// Wrapper component for Suspense
+const SuspenseWrapper = ({ children }) => (
+  <Suspense fallback={<LoadingFallback />}>
+    {children}
+  </Suspense>
+);
 // Protected route component
 export const ProtectedRoute = ({ children, requiredRoles = [] }) => {
   const token = localStorage.getItem('authToken');
@@ -42,56 +62,57 @@ export const ProtectedRoute = ({ children, requiredRoles = [] }) => {
 
 // Public routes
 export const publicRoutes = [
-  { path: '/', element: <Home /> },
-  { path: '/menu', element: <Menu /> },
-  { path: '/offers', element: <Offers /> },
-  { path: '/about', element: <About /> },
-  { path: '/login', element: <Login /> },
-  { path: '/forgot-password', element: <ForgotPassword /> },
-  { path: '/reset-password', element: <ResetPassword /> },
-  { path: '/old', element: <OldDashboard /> },
+  { path: '/', element: <SuspenseWrapper><Home /></SuspenseWrapper> },
+  { path: '/menu', element: <SuspenseWrapper><Menu /></SuspenseWrapper> },
+  { path: '/offers', element: <SuspenseWrapper><Offers /></SuspenseWrapper> },
+  { path: '/about', element: <SuspenseWrapper><About /></SuspenseWrapper> },
+  { path: '/login', element: <SuspenseWrapper><Login /></SuspenseWrapper> },
+  { path: '/forgot-password', element: <SuspenseWrapper><ForgotPassword /></SuspenseWrapper> },
+  { path: '/reset-password', element: <SuspenseWrapper><ResetPassword /></SuspenseWrapper> },
+  { path: '/order-tracking/:orderId', element: <SuspenseWrapper><OrderTracking /></SuspenseWrapper> },
+  { path: '/old', element: <SuspenseWrapper><OldDashboard /></SuspenseWrapper> },
 ];
 
 // Protected routes
 export const protectedRoutes = [
   {
     path: '/dashboard',
-    element: <Dashboard />,
+    element: <SuspenseWrapper><Dashboard /></SuspenseWrapper>,
     requiredRoles: ['owner', 'manager', 'staff']
   },
   {
     path: '/dashboard/menu',
-    element: <MenuManagement />,
+    element: <SuspenseWrapper><MenuManagement /></SuspenseWrapper>,
     requiredRoles: ['owner', 'manager']
   },
   {
     path: '/dashboard/offers',
-    element: <OffersManagement />,
+    element: <SuspenseWrapper><OffersManagement /></SuspenseWrapper>,
     requiredRoles: ['owner', 'manager']
   },
   {
     path: '/dashboard/users',
-    element: <UserManagement />,
+    element: <SuspenseWrapper><UserManagement /></SuspenseWrapper>,
     requiredRoles: ['owner']
   },
   {
     path: '/dashboard/qr-codes',
-    element: <QRCodeManagement />,
+    element: <SuspenseWrapper><QRCodeManagement /></SuspenseWrapper>,
     requiredRoles: ['owner', 'manager']
   },
   {
     path: '/dashboard/tables',
-    element: <TableManagement />,
+    element: <SuspenseWrapper><TableManagement /></SuspenseWrapper>,
     requiredRoles: ['owner', 'manager']
   },
   {
     path: '/dashboard/orders',
-    element: <OrderManagement />,
+    element: <SuspenseWrapper><OrderManagement /></SuspenseWrapper>,
     requiredRoles: ['owner', 'manager', 'staff']
   },
   {
     path: '/dashboard/settings',
-    element: <Settings />,
+    element: <SuspenseWrapper><Settings /></SuspenseWrapper>,
     requiredRoles: []
   }
 ]; 

@@ -48,8 +48,8 @@ const DashboardOrders = () => {
 
     fetchOrders();
 
-    // Set up polling to refresh orders
-    const interval = setInterval(fetchOrders, 30000);
+    // Set up polling to refresh orders - reduced to 10 seconds for better real-time feel
+    const interval = setInterval(fetchOrders, 10000);
     return () => clearInterval(interval);
   }, []);
 

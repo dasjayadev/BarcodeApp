@@ -17,17 +17,47 @@ const ManageOrders = () => {
   // Use ref to store orders data to avoid unnecessary re-renders
   const ordersRef = useRef([]);
 
+  // Track previous order count for notifications
+  const previousOrderCountRef = useRef(0);
+
   // Initial fetch and polling for orders
   useEffect(() => {
     fetchOrders(true);
 
-    // Set up polling to check for new orders
+    // Set up polling to check for new orders - reduced to 10 seconds for better real-time feel
     const interval = setInterval(() => {
       fetchOrders(false);
-    }, 30000); // Every 30 seconds
+    }, 10000); // Every 10 seconds for better responsiveness
 
     return () => clearInterval(interval);
   }, [statusFilter]);
+
+  // Check for new orders and show notification
+  useEffect(() => {
+    if (orders.length > 0 && previousOrderCountRef.current > 0) {
+      const newOrderCount = orders.length - previousOrderCountRef.current;
+      if (newOrderCount > 0 && statusFilter === "pending") {
+        // Show browser notification if permission granted
+        if (Notification.permission === "granted") {
+          new Notification(`New Order${newOrderCount > 1 ? 's' : ''} Received`, {
+            body: `${newOrderCount} new order${newOrderCount > 1 ? 's' : ''} waiting for processing`,
+            icon: '/favicon.ico',
+            tag: 'new-order',
+          });
+        }
+        // Show toast notification
+        InfoToast(`${newOrderCount} new order${newOrderCount > 1 ? 's' : ''} received!`);
+      }
+    }
+    previousOrderCountRef.current = orders.length;
+  }, [orders.length, statusFilter]);
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   // Separate timer effect that updates every second
   useEffect(() => {
@@ -183,12 +213,18 @@ const ManageOrders = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 md:p-6 lg:p-8">
       <DashboardNav />
-      <h1 className="text-3xl font-bold mb-4">Order Management</h1>
+      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Order Management</h1>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span>Auto-refreshing every 10 seconds</span>
+        </div>
+      </div>
 
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Filter Orders</h2>
+      <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
+        <h2 className="text-lg font-semibold mb-3 text-gray-900">Filter Orders</h2>
         <div className="flex flex-wrap gap-2">
           <button
             className={`px-4 py-2 rounded ${
@@ -247,7 +283,7 @@ const ManageOrders = () => {
           <p className="text-center py-4">Loading orders...</p>
         </div>
       ) : orders.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {orders.map((order) => {
             // Check if order is locked
             const locked = isOrderLocked(order);
@@ -256,11 +292,11 @@ const ManageOrders = () => {
             return (
               <div
                 key={order._id}
-                className={`border rounded-lg shadow-md overflow-hidden ${getStatusColor(
+                className={`border-2 rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl ${getStatusColor(
                   order.status
                 )} ${locked ? "opacity-80" : ""}`}
               >
-                <div className="p-4">
+                <div className="p-4 md:p-5">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-bold">
                       Order #{order._id.substring(order._id.length - 5)}
@@ -350,16 +386,16 @@ const ManageOrders = () => {
                   )}
 
                   <div className="mt-4">
-                    <h4 className="font-semibold mb-2">Update Status:</h4>
+                    <h4 className="font-semibold mb-2 text-sm text-gray-700">Update Status:</h4>
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() =>
                           handleUpdateOrderStatus(order._id, "pending")
                         }
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                           order.status === "pending"
-                            ? "bg-yellow-600 text-white"
-                            : "bg-gray-200"
+                            ? "bg-yellow-600 text-white shadow-md"
+                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                         }`}
                         disabled={order.status === "pending" || locked}
                       >
@@ -369,10 +405,10 @@ const ManageOrders = () => {
                         onClick={() =>
                           handleUpdateOrderStatus(order._id, "preparing")
                         }
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                           order.status === "preparing"
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-200"
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                         }`}
                         disabled={order.status === "preparing" || locked}
                       >
@@ -382,10 +418,10 @@ const ManageOrders = () => {
                         onClick={() =>
                           handleUpdateOrderStatus(order._id, "served")
                         }
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                           order.status === "served"
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-200"
+                            ? "bg-green-600 text-white shadow-md"
+                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                         }`}
                         disabled={order.status === "served" || locked}
                       >
@@ -395,10 +431,10 @@ const ManageOrders = () => {
                         onClick={() =>
                           handleUpdateOrderStatus(order._id, "completed")
                         }
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                           order.status === "completed"
-                            ? "bg-gray-600 text-white"
-                            : "bg-gray-200"
+                            ? "bg-gray-600 text-white shadow-md"
+                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                         }`}
                         disabled={order.status === "completed" || locked}
                       >
@@ -408,10 +444,10 @@ const ManageOrders = () => {
                         onClick={() =>
                           handleUpdateOrderStatus(order._id, "cancelled")
                         }
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                           order.status === "cancelled"
-                            ? "bg-red-600 text-white"
-                            : "bg-gray-200"
+                            ? "bg-red-600 text-white shadow-md"
+                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                         }`}
                         disabled={order.status === "cancelled" || locked}
                       >
@@ -420,17 +456,17 @@ const ManageOrders = () => {
                     </div>
                   </div>
 
-                  <div className="mt-3">
-                    <h4 className="font-semibold mb-2">Update Payment:</h4>
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <h4 className="font-semibold mb-2 text-sm text-gray-700">Update Payment:</h4>
                     <div className="flex gap-2">
                       <button
                         onClick={() =>
                           handleUpdatePaymentStatus(order._id, "paid")
                         }
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex-1 ${
                           order.paymentStatus === "paid"
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-200"
+                            ? "bg-green-600 text-white shadow-md"
+                            : "bg-gray-200 hover:bg-green-100 text-gray-700"
                         }`}
                         disabled={order.paymentStatus === "paid" || locked}
                       >
@@ -440,10 +476,10 @@ const ManageOrders = () => {
                         onClick={() =>
                           handleUpdatePaymentStatus(order._id, "unpaid")
                         }
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex-1 ${
                           order.paymentStatus === "unpaid"
-                            ? "bg-red-600 text-white"
-                            : "bg-gray-200"
+                            ? "bg-red-600 text-white shadow-md"
+                            : "bg-gray-200 hover:bg-red-100 text-gray-700"
                         }`}
                         disabled={order.paymentStatus === "unpaid" || locked}
                       >

@@ -129,6 +129,13 @@ export const getPublicTable = (id) => publicApi.get(`/public/tables/${id}`);
 export const getPublicTableMenu = (id) => publicApi.get(`/public/tables/${id}/menu`);
 // Add public order endpoint for guests
 export const createPublicOrder = (order) => publicApi.post('/public/orders', order);
+export const getPublicOrder = (id) => publicApi.get(`/public/orders/${id}`);
+
+// Get orders by table ID (for order history)
+export const getPublicOrdersByTable = (tableId, includeCompleted = false) => {
+  const params = includeCompleted ? { includeCompleted: 'true' } : {};
+  return publicApi.get(`/public/tables/${tableId}/orders`, { params });
+};
 
 // Offers services
 export const getOffers = () => api.get('/offers');

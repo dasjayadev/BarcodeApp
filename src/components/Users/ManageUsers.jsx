@@ -7,7 +7,10 @@ import {
 } from "../../services/api";
 import DashboardNav from "../../components/DashboardNav";
 import { Eye, EyeClosed } from "lucide-react";
-import {toast} from "react-hot-toast";
+import { SuccessToast, ErrorToast } from "../Common/Toast/Toast";
+import ErrorMessage from "../Common/Error/ErrorMessage";
+import SuccessMessage from "../Common/Success/SuccessMessage";
+import LoadingSpinner from "../Common/Loading/LoadingSpinner";
 
 const UserManagement = () => {
   const [user, setUser] = useState({
@@ -62,19 +65,20 @@ const UserManagement = () => {
 
         await updateUser(currentUserId, userData);
         setSuccess("User updated successfully");
-        toast.success("User updated successfully");
+        SuccessToast("User updated successfully");
       } else {
         await createUser(user);
-        // setSuccess("User created successfully");
-        toast.success("User created successfully");
+        setSuccess("User created successfully");
+        SuccessToast("User created successfully");
       }
 
       // Reset form and refresh users list
       resetForm();
       fetchUsers();
     } catch (err) {
-      setError(err.response?.data?.message || "An error occurred");
-      toast.error(err.response?.data?.message || "An error occurred");
+      const errorMsg = err.response?.data?.message || "An error occurred";
+      setError(errorMsg);
+      ErrorToast(errorMsg);
     }
   };
 
@@ -96,7 +100,9 @@ const UserManagement = () => {
         setSuccess("User deleted successfully");
         fetchUsers();
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to delete user");
+        const errorMsg = err.response?.data?.message || "Failed to delete user";
+        setError(errorMsg);
+        ErrorToast(errorMsg);
       }
     }
   };
@@ -116,22 +122,29 @@ const UserManagement = () => {
     setShowPassword(!showPassword);
   };
 
+  if (loading && users.length === 0) {
+    return (
+      <div className='container mx-auto p-4'>
+        <DashboardNav />
+        <LoadingSpinner text="Loading users..." />
+      </div>
+    );
+  }
+
   return (
-    <div className='container mx-auto p-4'>
+    <div className='container mx-auto p-4 md:p-6 lg:p-8'>
       <DashboardNav />
-      <h1 className='text-3xl font-bold mb-4'>User Management</h1>
+      <h1 className='text-2xl md:text-3xl font-bold mb-6 text-gray-900'>User Management</h1>
 
-      {error && (
-        <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
-          {error}
-        </div>
-      )}
+      <ErrorMessage 
+        message={error} 
+        onDismiss={() => setError('')} 
+      />
 
-      {success && (
-        <div className='bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4'>
-          {success}
-        </div>
-      )}
+      <SuccessMessage 
+        message={success} 
+        onDismiss={() => setSuccess('')} 
+      />
 
       <div className='flex justify-center items-start gap-3'>
         <form onSubmit={handleSubmit} className='w-md mx-auto mb-8'>

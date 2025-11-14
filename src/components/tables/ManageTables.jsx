@@ -158,10 +158,18 @@ const ManageTables = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 md:p-6 lg:p-8">
       <DashboardNav />
-      <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold mb-6">Table Management</h1>
+      <div className="bg-white shadow-lg rounded-xl p-6 md:p-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Table Management</h1>
+          <button 
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
+            onClick={handleAddTable}
+          >
+            Add New Table
+          </button>
+        </div>
         
         {error && (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
@@ -175,73 +183,71 @@ const ManageTables = () => {
           </div>
         )}
         
-        <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-xl">Tables ({tables.length})</h2>
-          <button 
-            className="bg-orange-500 hover:bg-orange-400 text-white px-4 py-2 rounded"
-            onClick={handleAddTable}
-          >
-            Add New Table
-          </button>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-gray-700">Tables ({tables.length})</h2>
         </div>
 
         {tables.length === 0 ? (
-          <p className="text-gray-500">No tables found. Add a table to get started.</p>
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <p className="text-gray-500 text-lg mb-4">No tables found. Add a table to get started.</p>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto shadow-sm rounded-lg border border-gray-200">
             <table className="min-w-full bg-white">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-2 px-4 border-b text-left">Table Number</th>
-                  <th className="py-2 px-4 border-b text-left">Capacity</th>
-                  <th className="py-2 px-4 border-b text-left">Section</th>
-                  <th className="py-2 px-4 border-b text-left">Status</th>
-                  <th className="py-2 px-4 border-b text-left">QR Code</th>
-                  <th className="py-2 px-4 border-b text-left">Actions</th>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="py-3 px-4 md:px-6 text-left text-sm font-semibold text-gray-900">Table Number</th>
+                  <th className="py-3 px-4 md:px-6 text-left text-sm font-semibold text-gray-900">Capacity</th>
+                  <th className="py-3 px-4 md:px-6 text-left text-sm font-semibold text-gray-900">Section</th>
+                  <th className="py-3 px-4 md:px-6 text-left text-sm font-semibold text-gray-900">Status</th>
+                  <th className="py-3 px-4 md:px-6 text-left text-sm font-semibold text-gray-900">QR Code</th>
+                  <th className="py-3 px-4 md:px-6 text-left text-sm font-semibold text-gray-900">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {tables.map(table => (
-                  <tr key={table._id}>
-                    <td className="py-2 px-4 border-b">{table.tableNumber}</td>
-                    <td className="py-2 px-4 border-b">{table.capacity}</td>
-                    <td className="py-2 px-4 border-b">{table.section || '-'}</td>
-                    <td className="py-2 px-4 border-b">
-                      <span className={`px-2 py-1 rounded text-xs 
+                  <tr key={table._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-3 px-4 md:px-6 text-sm font-medium text-gray-900">{table.tableNumber}</td>
+                    <td className="py-3 px-4 md:px-6 text-sm text-gray-600">{table.capacity}</td>
+                    <td className="py-3 px-4 md:px-6 text-sm text-gray-600">{table.section || '-'}</td>
+                    <td className="py-3 px-4 md:px-6">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium
                         ${table.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                         {table.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="py-2 px-4 border-b">
+                    <td className="py-3 px-4 md:px-6">
                       {table.qrCode ? (
                         <button 
                           onClick={() => handleViewQR(table)}
-                          className="text-orange-500 hover:text-orange-400"
+                          className="text-orange-500 hover:text-orange-600 font-medium text-sm transition-colors"
                         >
                           View QR
                         </button>
                       ) : (
                         <button 
-                          className="text-orange-500 hover:text-orange-400"
+                          className="text-orange-500 hover:text-orange-600 font-medium text-sm transition-colors"
                           onClick={() => handleGenerateQR(table._id)}
                         >
                           Generate QR
                         </button>
                       )}
                     </td>
-                    <td className="py-2 px-4 border-b">
-                      <button 
-                        className="text-emerald-500 hover:text-emerald-700 mr-2"
-                        onClick={() => handleEditTable(table)}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDeleteClick(table._id)}
-                      >
-                        Delete
-                      </button>
+                    <td className="py-3 px-4 md:px-6">
+                      <div className="flex gap-2">
+                        <button 
+                          className="text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+                          onClick={() => handleEditTable(table)}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="text-red-600 hover:text-red-700 font-medium text-sm transition-colors"
+                          onClick={() => handleDeleteClick(table._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
